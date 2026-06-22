@@ -1,21 +1,20 @@
-import { Layout, Menu } from 'antd'
 import PinDropOutlined from '@mui/icons-material/PinDropOutlined'
 import PrecisionManufacturingOutlined from '@mui/icons-material/PrecisionManufacturingOutlined'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { Logo, MenuList, NavSider, Subtitle, Title } from './styles'
 
-export function SideNav() {
+export function Sidebar() {
   const location = useLocation()
   const navigate = useNavigate()
 
   return (
-    <Layout.Sider className="den-sider" width={280}>
-      <div className="den-logo">
-        <h1 className="den-logo__title">DenkenHub</h1>
-        <p className="den-logo__subtitle">Gestão de recursos</p>
-      </div>
+    <NavSider width={280}>
+      <Logo>
+        <Title>DenkenHub</Title>
+        <Subtitle>Gestão de recursos</Subtitle>
+      </Logo>
 
-      <Menu
-        className="den-nav"
+      <MenuList
         mode="inline"
         selectedKeys={[location.pathname.startsWith('/equipamentos') ? '/equipamentos' : '']}
         onClick={({ key }) => navigate(key)}
@@ -33,6 +32,6 @@ export function SideNav() {
           },
         ]}
       />
-    </Layout.Sider>
+    </NavSider>
   )
 }

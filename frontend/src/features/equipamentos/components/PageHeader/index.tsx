@@ -1,5 +1,5 @@
-import { Button } from 'antd'
 import AddCircleOutlineOutlined from '@mui/icons-material/AddCircleOutlineOutlined'
+import { BrandButton, Container, Description, Title } from './styles'
 
 interface PageHeaderProps {
   onCreateEquipment: () => void
@@ -7,22 +7,19 @@ interface PageHeaderProps {
 
 export function PageHeader({ onCreateEquipment }: PageHeaderProps) {
   return (
-    <header className="equipment-page-header">
+    <Container>
       <div>
-        <h2 className="equipment-page-title">Equipamentos</h2>
-        <p className="equipment-page-description">
-          Gerencie os equipamentos cadastrados no laboratório.
-        </p>
+        <Title>Equipamentos</Title>
+        <Description>Gerencie os equipamentos cadastrados no laboratório.</Description>
       </div>
 
-      <Button
-        className="brand-action"
+      <BrandButton
         type="primary"
         icon={<AddCircleOutlineOutlined fontSize="small" />}
         onClick={onCreateEquipment}
       >
         Novo equipamento
-      </Button>
-    </header>
+      </BrandButton>
+    </Container>
   )
 }

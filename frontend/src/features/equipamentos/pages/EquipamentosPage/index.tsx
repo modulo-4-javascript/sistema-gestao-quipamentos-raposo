@@ -1,17 +1,18 @@
 import { message } from 'antd'
 import { useState } from 'react'
-import { AppLayout } from '../components/AppLayout'
-import { EquipmentFilters } from '../components/EquipmentFilters'
-import { EquipmentTable } from '../components/EquipmentTable'
-import { PageHeader } from '../components/PageHeader'
-import { SummaryCards } from '../components/SummaryCards'
+import { AppLayout } from '../../../../app/layout/AppLayout'
+import { EquipmentFilters } from '../../components/EquipmentFilters'
+import { EquipmentTable } from '../../components/EquipmentTable'
+import { PageHeader } from '../../components/PageHeader'
+import { SummaryCards } from '../../components/SummaryCards'
 import {
   equipamentosMock,
   resumoEquipamentosMock,
   statusOptions,
   tipoOptions,
-} from '../mocks/equipamentos.mock'
-import type { EquipmentStatus, EquipmentType } from '../types/equipamento'
+} from '../../mocks/equipamentos.mock'
+import type { EquipmentStatus, EquipmentType } from '../../types/equipamento'
+import { Container } from './styles'
 
 export function EquipamentosPage() {
   const [messageApi, contextHolder] = message.useMessage()
@@ -34,9 +35,9 @@ export function EquipamentosPage() {
   const equipamentosVisiveis = equipamentosMock
 
   return (
-    <AppLayout>
+    <AppLayout currentPage="Equipamentos">
       {contextHolder}
-      <section className="equipment-page">
+      <Container>
         <PageHeader onCreateEquipment={handleCreateEquipment} />
 
         <SummaryCards summaries={resumoEquipamentosMock} />
@@ -54,7 +55,7 @@ export function EquipamentosPage() {
         />
 
         <EquipmentTable equipments={equipamentosVisiveis} />
-      </section>
+      </Container>
     </AppLayout>
   )
 }

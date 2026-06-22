@@ -1,12 +1,20 @@
-import { Button, Card, Dropdown, Table } from 'antd'
 import ComputerOutlined from '@mui/icons-material/ComputerOutlined'
 import DeleteOutlineOutlined from '@mui/icons-material/DeleteOutlineOutlined'
 import EditOutlined from '@mui/icons-material/EditOutlined'
 import MoreHorizOutlined from '@mui/icons-material/MoreHorizOutlined'
 import VisibilityOutlined from '@mui/icons-material/VisibilityOutlined'
+import { Dropdown, Table } from 'antd'
 import type { TableProps } from 'antd'
-import type { Equipment } from '../types/equipamento'
-import { StatusBadge } from './StatusBadge'
+import type { Equipment } from '../../types/equipamento'
+import { StatusBadge } from '../StatusBadge'
+import {
+  ActionButton,
+  EquipmentCell,
+  EquipmentCode,
+  EquipmentIcon,
+  EquipmentName,
+  TableCard,
+} from './styles'
 
 interface EquipmentTableProps {
   equipments: Equipment[]
@@ -30,15 +38,15 @@ const columns: TableProps<Equipment>['columns'] = [
     dataIndex: 'name',
     key: 'name',
     render: (_, equipment) => (
-      <div className="equipment-cell">
-        <span className="equipment-cell__icon">
+      <EquipmentCell>
+        <EquipmentIcon>
           <ComputerOutlined fontSize="small" />
-        </span>
+        </EquipmentIcon>
         <span>
-          <strong className="equipment-cell__name">{equipment.name}</strong>
-          <small className="equipment-cell__id">{equipment.id}</small>
+          <EquipmentName>{equipment.name}</EquipmentName>
+          <EquipmentCode>{equipment.id}</EquipmentCode>
         </span>
-      </div>
+      </EquipmentCell>
     ),
   },
   {
@@ -96,9 +104,8 @@ const columns: TableProps<Equipment>['columns'] = [
           ],
         }}
       >
-        <Button
+        <ActionButton
           aria-label={`Abrir ações de ${equipment.name}`}
-          className="table-action-button"
           icon={<MoreHorizOutlined fontSize="small" />}
           type="text"
         />
@@ -109,7 +116,7 @@ const columns: TableProps<Equipment>['columns'] = [
 
 export function EquipmentTable({ equipments }: EquipmentTableProps) {
   return (
-    <Card className="equipment-table-card" styles={{ body: { padding: 0 } }}>
+    <TableCard styles={{ body: { padding: 0 } }}>
       {/* Este componente foi separado para reaproveitarmos em outras telas */}
       <Table
         columns={columns}
@@ -118,6 +125,6 @@ export function EquipmentTable({ equipments }: EquipmentTableProps) {
         rowKey="id"
         scroll={{ x: 980 }}
       />
-    </Card>
+    </TableCard>
   )
 }

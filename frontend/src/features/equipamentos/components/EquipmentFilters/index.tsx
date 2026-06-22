@@ -1,6 +1,7 @@
-import { Button, Card, Input, Select } from 'antd'
 import SearchOutlined from '@mui/icons-material/SearchOutlined'
-import type { EquipmentStatus, EquipmentType } from '../types/equipamento'
+import { Button, Input, Select } from 'antd'
+import type { EquipmentStatus, EquipmentType } from '../../types/equipamento'
+import { Field, FieldLabel, FilterCard, FiltersGrid } from './styles'
 
 interface EquipmentFiltersProps {
   searchText: string
@@ -26,10 +27,10 @@ export function EquipmentFilters({
   onClear,
 }: EquipmentFiltersProps) {
   return (
-    <Card className="equipment-filters" styles={{ body: { padding: 24 } }}>
-      <div className="equipment-filters__grid">
-        <label>
-          <span className="field-label">Busca</span>
+    <FilterCard styles={{ body: { padding: 24 } }}>
+      <FiltersGrid>
+        <Field>
+          <FieldLabel>Busca</FieldLabel>
           <Input
             allowClear
             prefix={<SearchOutlined fontSize="small" />}
@@ -37,10 +38,10 @@ export function EquipmentFilters({
             value={searchText}
             onChange={(event) => onSearchChange(event.target.value)}
           />
-        </label>
+        </Field>
 
-        <label>
-          <span className="field-label">Status</span>
+        <Field>
+          <FieldLabel>Status</FieldLabel>
           <Select
             allowClear
             placeholder="Todos"
@@ -52,10 +53,10 @@ export function EquipmentFilters({
             }))}
             style={{ width: '100%' }}
           />
-        </label>
+        </Field>
 
-        <label>
-          <span className="field-label">Tipo</span>
+        <Field>
+          <FieldLabel>Tipo</FieldLabel>
           <Select
             allowClear
             placeholder="Selecione um tipo..."
@@ -67,10 +68,10 @@ export function EquipmentFilters({
             }))}
             style={{ width: '100%' }}
           />
-        </label>
+        </Field>
 
         <Button onClick={onClear}>Limpar filtros</Button>
-      </div>
-    </Card>
+      </FiltersGrid>
+    </FilterCard>
   )
 }

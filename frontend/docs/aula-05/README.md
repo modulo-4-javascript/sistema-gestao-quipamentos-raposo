@@ -53,8 +53,17 @@ frontend/src
 ├── app
 │   ├── App.tsx
 │   ├── routes.tsx
+│   ├── layout
+│   │   ├── AppLayout
+│   │   └── components
+│   │       ├── Header
+│   │       └── Sidebar
+│   ├── theme
+│   │   └── appTheme.ts
 │   └── styles
-│       └── global.css
+│       ├── base.css
+│       ├── global.css
+│       └── tokens.css
 └── features
     └── equipamentos
         ├── components
@@ -69,7 +78,11 @@ Contém configurações gerais da aplicação:
 
 - `App.tsx`: configura o Ant Design, o tema visual e o `BrowserRouter`.
 - `routes.tsx`: concentra as rotas principais da aplicação.
-- `styles/global.css`: guarda estilos globais e tokens visuais usados pela tela.
+- `layout`: concentra o layout geral da aplicação, como `AppLayout`, `Header` e `Sidebar`.
+- `theme/appTheme.ts`: guarda o tema do Ant Design em um arquivo separado.
+- `styles/global.css`: importa os arquivos globais na ordem correta.
+- `styles/tokens.css`: guarda os tokens visuais extraídos do Figma.
+- `styles/base.css`: guarda resets e estilos base da aplicação.
 
 ### `frontend/src/features/equipamentos`
 
@@ -79,6 +92,33 @@ Contém tudo que pertence à feature de equipamentos:
 - `mocks`: dados temporários para simular API.
 - `pages`: páginas acessadas por rota.
 - `types`: tipos TypeScript usados pela feature.
+
+## Padrão de componentes usado na aula
+
+Cada componente foi organizado em uma pasta própria. Dentro de cada pasta temos:
+
+```txt
+NomeDoComponente
+├── index.tsx
+└── styles.ts
+```
+
+Esse padrão foi escolhido para deixar a separação bem clara para alunos iniciantes:
+
+- `index.tsx`: fica com a estrutura JSX e a lógica simples do componente.
+- `styles.ts`: fica com os estilos do componente usando `styled-components`.
+
+Exemplo:
+
+```txt
+frontend/src/features/equipamentos/components/EquipmentFilters
+├── index.tsx
+└── styles.ts
+```
+
+Ponto importante para explicar:
+
+> O componente cuida da estrutura e o `styles.ts` cuida da aparência. Isso evita um arquivo grande demais e facilita encontrar onde cada coisa está.
 
 ## Arquivos principais
 
@@ -92,6 +132,21 @@ Arquivo responsável por envolver a aplicação com:
 - `BrowserRouter` para as rotas.
 
 Esse arquivo é um bom ponto para explicar que algumas configurações ficam no nível da aplicação inteira.
+
+### `frontend/src/app/theme/appTheme.ts`
+
+Arquivo responsável por concentrar o tema do Ant Design.
+
+Ele guarda:
+
+- Cores principais.
+- Fonte padrão.
+- Raio de borda.
+- Ajustes de componentes do Ant Design, como `Button`, `Card` e `Table`.
+
+Ponto importante para explicar:
+
+> Separar o tema deixa o `App.tsx` mais fácil de ler. O `App.tsx` mostra a estrutura da aplicação, enquanto `appTheme.ts` guarda os detalhes visuais do Ant Design.
 
 ### `frontend/src/app/routes.tsx`
 
@@ -110,9 +165,19 @@ Pontos para explicar:
 - A rota `*` evita que o usuário fique em uma URL inexistente.
 - Existe um TODO para uma futura rota de detalhes.
 
-### `frontend/src/app/styles/global.css`
+### Arquivos de estilo em `frontend/src/app/styles`
 
-Arquivo com os estilos globais da aplicação e os tokens de cor extraídos do Figma.
+A pasta de estilos globais foi dividida para evitar um arquivo grande demais:
+
+- `global.css`: arquivo agregador. Ele importa os outros estilos globais.
+- `tokens.css`: cores, fontes e valores reutilizáveis.
+- `base.css`: estilos base da aplicação.
+
+Essa organização ajuda os alunos a entenderem a responsabilidade de cada arquivo.
+
+### `frontend/src/app/styles/tokens.css`
+
+Arquivo com os tokens de cor extraídos do Figma.
 
 Cores principais usadas:
 
@@ -129,16 +194,17 @@ Border/Default:  #DDE6EE
 
 Ponto importante para explicar:
 
-> Nem todo CSS precisa ficar dentro do componente. Quando um estilo pertence ao layout geral ou a uma identidade visual, podemos centralizar em um CSS global simples.
+> Nem todo estilo precisa ficar dentro de um CSS global. Quando um estilo pertence à identidade visual, usamos tokens reutilizáveis. Quando pertence a um componente, usamos o `styles.ts` daquele componente.
 
-## Componentes da feature
+## Componentes de layout da aplicação
 
 ### `AppLayout`
 
 Arquivo:
 
 ```txt
-frontend/src/features/equipamentos/components/AppLayout.tsx
+frontend/src/app/layout/AppLayout/index.tsx
+frontend/src/app/layout/AppLayout/styles.ts
 ```
 
 Responsabilidade:
@@ -150,14 +216,15 @@ Responsabilidade:
 
 O que explicar:
 
-> Esse componente evita que a página principal precise conhecer todos os detalhes do layout. Assim, a página foca no conteúdo da feature.
+> Esse componente evita que as páginas precisem repetir menu, header e área de conteúdo. Assim, cada página foca no conteúdo dela.
 
-### `SideNav`
+### `Sidebar`
 
 Arquivo:
 
 ```txt
-frontend/src/features/equipamentos/components/SideNav.tsx
+frontend/src/app/layout/components/Sidebar/index.tsx
+frontend/src/app/layout/components/Sidebar/styles.ts
 ```
 
 Responsabilidade:
@@ -171,29 +238,34 @@ Ponto didático:
 
 > A opção "Localizações" está desabilitada porque ainda não faz parte da Aula 05. Isso mostra que podemos preparar a navegação sem implementar tudo de uma vez.
 
-### `TopBar`
+### `Header`
 
 Arquivo:
 
 ```txt
-frontend/src/features/equipamentos/components/TopBar.tsx
+frontend/src/app/layout/components/Header/index.tsx
+frontend/src/app/layout/components/Header/styles.ts
 ```
 
 Responsabilidade:
 
 - Mostrar o breadcrumb da tela atual.
 - Manter a barra superior fixa no topo.
+- Receber o nome da página atual por props.
 
 Ponto didático:
 
 > Breadcrumb ajuda o usuário a entender onde está dentro do sistema.
+
+## Componentes da feature
 
 ### `PageHeader`
 
 Arquivo:
 
 ```txt
-frontend/src/features/equipamentos/components/PageHeader.tsx
+frontend/src/features/equipamentos/components/PageHeader/index.tsx
+frontend/src/features/equipamentos/components/PageHeader/styles.ts
 ```
 
 Responsabilidade:
@@ -211,7 +283,8 @@ Ponto didático:
 Arquivo:
 
 ```txt
-frontend/src/features/equipamentos/components/SummaryCards.tsx
+frontend/src/features/equipamentos/components/SummaryCards/index.tsx
+frontend/src/features/equipamentos/components/SummaryCards/styles.ts
 ```
 
 Responsabilidade:
@@ -229,7 +302,8 @@ Ponto didático:
 Arquivo:
 
 ```txt
-frontend/src/features/equipamentos/components/EquipmentFilters.tsx
+frontend/src/features/equipamentos/components/EquipmentFilters/index.tsx
+frontend/src/features/equipamentos/components/EquipmentFilters/styles.ts
 ```
 
 Responsabilidade:
@@ -248,7 +322,8 @@ Ponto didático:
 Arquivo:
 
 ```txt
-frontend/src/features/equipamentos/components/EquipmentTable.tsx
+frontend/src/features/equipamentos/components/EquipmentTable/index.tsx
+frontend/src/features/equipamentos/components/EquipmentTable/styles.ts
 ```
 
 Responsabilidade:
@@ -267,7 +342,8 @@ Ponto didático:
 Arquivo:
 
 ```txt
-frontend/src/features/equipamentos/components/StatusBadge.tsx
+frontend/src/features/equipamentos/components/StatusBadge/index.tsx
+frontend/src/features/equipamentos/components/StatusBadge/styles.ts
 ```
 
 Responsabilidade:
@@ -381,13 +457,19 @@ Abra:
 
 ```txt
 frontend/src/app/App.tsx
+frontend/src/app/theme/appTheme.ts
 frontend/src/app/styles/global.css
+frontend/src/app/styles/tokens.css
+frontend/src/app/styles/base.css
 ```
 
 Explique:
 
 - O `ConfigProvider` do Ant Design.
+- O arquivo `appTheme.ts`.
 - Os tokens de cor usados no CSS.
+- A diferença entre estilos globais e estilos de componentes.
+- O uso de `styled-components` nos arquivos `styles.ts`.
 - A relação entre Figma e código.
 
 Fala sugerida:
@@ -399,7 +481,8 @@ Fala sugerida:
 Abra:
 
 ```txt
-frontend/src/features/equipamentos/pages/EquipamentosPage.tsx
+frontend/src/features/equipamentos/pages/EquipamentosPage/index.tsx
+frontend/src/features/equipamentos/pages/EquipamentosPage/styles.ts
 ```
 
 Mostre que a página:
@@ -441,7 +524,8 @@ Peça para os alunos adicionarem mais um equipamento mockado e verificarem se ap
 Abra:
 
 ```txt
-frontend/src/features/equipamentos/components/SummaryCards.tsx
+frontend/src/features/equipamentos/components/SummaryCards/index.tsx
+frontend/src/features/equipamentos/components/SummaryCards/styles.ts
 ```
 
 Explique:
@@ -449,7 +533,7 @@ Explique:
 - Uso de `map`.
 - Uso de props.
 - Renderização condicional dos ícones.
-- Uso de estilo por CSS variable para a cor de cada card.
+- Uso de props no `styled-components` para a cor de cada card.
 
 Atividade rápida:
 
@@ -460,7 +544,8 @@ Peça para alterar o valor de um card no mock e observar a tela.
 Abra:
 
 ```txt
-frontend/src/features/equipamentos/components/EquipmentFilters.tsx
+frontend/src/features/equipamentos/components/EquipmentFilters/index.tsx
+frontend/src/features/equipamentos/components/EquipmentFilters/styles.ts
 ```
 
 Explique:
@@ -479,7 +564,7 @@ Fala sugerida:
 Volte para:
 
 ```txt
-frontend/src/features/equipamentos/pages/EquipamentosPage.tsx
+frontend/src/features/equipamentos/pages/EquipamentosPage/index.tsx
 ```
 
 Substitua este trecho:
@@ -522,7 +607,8 @@ O que explicar:
 Abra:
 
 ```txt
-frontend/src/features/equipamentos/components/EquipmentTable.tsx
+frontend/src/features/equipamentos/components/EquipmentTable/index.tsx
+frontend/src/features/equipamentos/components/EquipmentTable/styles.ts
 ```
 
 Explique:
@@ -542,12 +628,13 @@ Ponto didático:
 Abra:
 
 ```txt
-frontend/src/features/equipamentos/components/StatusBadge.tsx
+frontend/src/features/equipamentos/components/StatusBadge/index.tsx
+frontend/src/features/equipamentos/components/StatusBadge/styles.ts
 ```
 
 Explique:
 
-- Como um objeto pode mapear status para classe CSS.
+- Como uma função simples pode escolher cor de acordo com o status.
 - Como esse componente deixa a tabela mais limpa.
 
 Atividade rápida:
@@ -579,7 +666,7 @@ Uma ordem tranquila para a aula:
 3. Explicar os tipos em `types/equipamento.ts`.
 4. Mostrar os mocks em `mocks/equipamentos.mock.ts`.
 5. Mostrar a rota em `app/routes.tsx`.
-6. Mostrar o layout base com `AppLayout`, `SideNav` e `TopBar`.
+6. Mostrar o layout base com `AppLayout`, `Sidebar` e `Header`.
 7. Mostrar a página `EquipamentosPage`.
 8. Mostrar `PageHeader`.
 9. Mostrar `SummaryCards`.
