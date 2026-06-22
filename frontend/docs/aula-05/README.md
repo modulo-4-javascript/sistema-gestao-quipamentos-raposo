@@ -6,6 +6,10 @@ Montar a base visual do sistema DenkenHub usando React, TypeScript, Ant Design, 
 
 A ideia da aula não é entregar tudo pronto. O projeto já tem várias partes preparadas e comentadas para serem descomentadas aos poucos durante a explicação.
 
+Para acompanhar a prática em sala, use também o guia dos alunos:
+
+- [README-alunos.md](./README-alunos.md)
+
 ## O foco da aula
 
 - Entender a estrutura inicial do projeto.
