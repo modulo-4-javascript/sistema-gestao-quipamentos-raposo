@@ -1,109 +1,70 @@
-import type { EquipmentDetail, EquipmentDetailSummary } from '../types/equipment'
+import {
+  formatEquipmentDate,
+  getEquipmentStatusLabel,
+  type EquipmentDetail,
+  type EquipmentDetailSummary,
+} from '../types/equipment'
 
 // AULA 06:
-// Este mock representa o retorno futuro de GET /equipments/{equipmentId}.
-// Ele fica separado da listagem porque a tela de detalhes precisa de mais informacoes.
+// Este mock representa o retorno futuro de GET /equipment/{equipmentId}.
+// Na Aula 07, a tela passa a buscar estes dados na API real.
 export const equipmentDetailsMock: EquipmentDetail[] = [
   {
-    id: 'EQP-001',
+    id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+    code: 'EQP-001',
     name: 'Notebook Dell',
-    type: 'Informática',
+    type: 'NOTEBOOK',
     model: 'Latitude 5420',
-    status: 'Disponível',
-    location: 'Laboratório 01',
-    lastUpdate: 'Hoje às 14:35',
+    status: 'AVAILABLE',
+    locationId: '11111111-1111-4111-8111-111111111111',
+    locationName: 'LAB-01 - Lab 01',
     serialNumber: 'DL-5420-2026',
-    responsible: {
-      initials: 'JS',
-      name: 'João Silva',
-    },
-    createdAt: '15/01/2023',
+    responsibleUserId: null,
+    createdAt: '2026-01-15T10:00:00.000Z',
+    updatedAt: '2026-01-15T10:00:00.000Z',
     notes:
-      'Equipamento disponível para uso em aulas práticas. Última revisão realizada sem pendências. Bateria apresentando boa autonomia.',
-    history: [
+      'Equipamento disponível para uso em aulas práticas. Última revisão realizada sem pendências.',
+    recentHistory: [
       {
         id: 'history-001',
-        date: '24 Out 2023, 14:30',
-        title: 'Status atualizado',
-        description: 'Alterado de "Em manutenção" para "Disponível".',
+        type: 'STATUS_CHANGED',
+        equipmentId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+        title: 'Status updated',
+        description: 'Changed from IN_MAINTENANCE to AVAILABLE.',
+        createdAt: '2026-01-20T14:30:00.000Z',
       },
       {
         id: 'history-002',
-        date: '20 Out 2023, 09:15',
-        title: 'Equipamento revisado',
-        description: 'Manutenção preventiva concluída pela equipe técnica.',
+        type: 'CREATED',
+        equipmentId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+        title: 'Equipment created',
+        description: 'Dell Notebook was registered in the inventory.',
+        createdAt: '2026-01-15T10:00:00.000Z',
       },
+    ],
+  },
+  {
+    id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+    code: 'EQP-002',
+    name: 'Monitor LG',
+    type: 'MONITOR',
+    model: 'UltraWide 29"',
+    status: 'AVAILABLE',
+    locationId: '11111111-1111-4111-8111-111111111111',
+    locationName: 'LAB-01 - Lab 01',
+    serialNumber: 'LG-29-042',
+    responsibleUserId: null,
+    createdAt: '2026-01-15T10:05:00.000Z',
+    updatedAt: '2026-01-15T10:05:00.000Z',
+    notes: 'Monitor usado junto à estação do professor.',
+    recentHistory: [
       {
         id: 'history-003',
-        date: '15 Mai 2023, 11:00',
-        title: 'Localização alterada',
-        description: 'Movido de "Almoxarifado" para "Lab Info 1".',
-      },
-      {
-        id: 'history-004',
-        date: '15 Jan 2023, 10:00',
-        title: 'Equipamento cadastrado',
-        description: 'Registro inicial no sistema.',
-      },
-    ],
-  },
-  {
-    id: 'EQP-042',
-    name: 'Monitor LG',
-    type: 'Informática',
-    model: 'UltraWide 29"',
-    status: 'Disponível',
-    location: 'Laboratório 02',
-    lastUpdate: '22 Out 2023',
-    serialNumber: 'LG-29-042',
-    responsible: {
-      initials: 'MA',
-      name: 'Marina Alves',
-    },
-    createdAt: '02/02/2023',
-    notes: 'Monitor reservado para estações de desenvolvimento e edição de imagem.',
-    history: [
-      {
-        id: 'history-005',
-        date: '22 Out 2023, 16:10',
-        title: 'Inventário conferido',
-        description: 'Patrimônio validado durante conferência mensal.',
-      },
-      {
-        id: 'history-006',
-        date: '02 Fev 2023, 08:40',
-        title: 'Equipamento cadastrado',
-        description: 'Registro inicial no sistema.',
-      },
-    ],
-  },
-  {
-    id: 'EQP-087',
-    name: 'Projetor Epson',
-    type: 'Imagem',
-    model: 'PowerLite E20',
-    status: 'Em manutenção',
-    location: 'Auditório',
-    lastUpdate: '20 Out 2023',
-    serialNumber: 'EP-E20-087',
-    responsible: {
-      initials: 'RC',
-      name: 'Rafael Costa',
-    },
-    createdAt: '10/03/2023',
-    notes: 'Equipamento aguardando troca de lâmpada antes de voltar para uso regular.',
-    history: [
-      {
-        id: 'history-007',
-        date: '20 Out 2023, 09:15',
-        title: 'Manutenção aberta',
-        description: 'Chamado técnico aberto para troca de lâmpada.',
-      },
-      {
-        id: 'history-008',
-        date: '10 Mar 2023, 14:20',
-        title: 'Equipamento cadastrado',
-        description: 'Registro inicial no sistema.',
+        type: 'CREATED',
+        equipmentId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+        title: 'Equipment created',
+        description: 'LG Monitor was registered in the inventory.',
+        createdAt: '2026-01-15T10:05:00.000Z',
       },
     ],
   },
@@ -114,25 +75,25 @@ export function getEquipmentDetailSummary(equipment: EquipmentDetail): Equipment
     {
       id: 'status',
       title: 'Status',
-      value: equipment.status,
-      description: equipment.status === 'Disponível' ? 'Pronto para uso' : 'Acompanha restrição',
+      value: getEquipmentStatusLabel(equipment.status),
+      description: equipment.status === 'AVAILABLE' ? 'Pronto para uso' : 'Acompanha restrição',
     },
     {
       id: 'location',
       title: 'Localização',
-      value: equipment.location,
+      value: equipment.locationName ?? 'Sem localização',
       description: 'Setor atual',
     },
     {
       id: 'responsible',
       title: 'Responsável',
-      value: equipment.responsible.name,
+      value: 'Equipe de patrimônio',
       description: 'Pessoa de referência',
     },
     {
       id: 'updatedAt',
       title: 'Atualizado',
-      value: equipment.lastUpdate,
+      value: formatEquipmentDate(equipment.updatedAt),
       description: 'Última alteração',
     },
   ]

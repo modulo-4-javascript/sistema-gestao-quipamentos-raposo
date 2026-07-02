@@ -1,7 +1,11 @@
 import ComputerOutlined from '@mui/icons-material/ComputerOutlined'
 import EditOutlined from '@mui/icons-material/EditOutlined'
 import { Button, Modal } from 'antd'
-import type { Equipment } from '../../types/equipment'
+import {
+  formatEquipmentDate,
+  getEquipmentTypeLabel,
+  type Equipment,
+} from '../../types/equipment'
 import { StatusBadge } from '../StatusBadge'
 import {
   Code,
@@ -58,7 +62,7 @@ export function EquipmentDetailsModal({
 
             <TitleGroup>
               <Title>{equipment.name}</Title>
-              <Code>{equipment.id}</Code>
+              <Code>{equipment.code}</Code>
               <StatusBadge status={equipment.status} />
             </TitleGroup>
           </Header>
@@ -66,27 +70,27 @@ export function EquipmentDetailsModal({
           <DetailsGrid>
             <DetailItem>
               <DetailLabel>Tipo</DetailLabel>
-              <DetailValue>{equipment.type}</DetailValue>
+              <DetailValue>{getEquipmentTypeLabel(equipment.type)}</DetailValue>
             </DetailItem>
 
             <DetailItem>
               <DetailLabel>Modelo</DetailLabel>
-              <DetailValue>{equipment.model}</DetailValue>
+              <DetailValue>{equipment.model ?? 'Não informado'}</DetailValue>
             </DetailItem>
 
             <DetailItem>
               <DetailLabel>Localização</DetailLabel>
-              <DetailValue>{equipment.location}</DetailValue>
+              <DetailValue>{equipment.locationName ?? 'Sem localização'}</DetailValue>
             </DetailItem>
 
             <DetailItem>
               <DetailLabel>Última atualização</DetailLabel>
-              <DetailValue>{equipment.lastUpdate}</DetailValue>
+              <DetailValue>{formatEquipmentDate(equipment.updatedAt)}</DetailValue>
             </DetailItem>
 
             <DetailItem>
               <DetailLabel>Número de série</DetailLabel>
-              <DetailValue>{equipment.serialNumber}</DetailValue>
+              <DetailValue>{equipment.serialNumber ?? 'Não informado'}</DetailValue>
             </DetailItem>
 
             <DetailItem>

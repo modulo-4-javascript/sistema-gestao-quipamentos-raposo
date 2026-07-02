@@ -1,33 +1,52 @@
 import { Form, Input, Select } from 'antd'
 import { useEffect } from 'react'
-import type { Equipment, EquipmentStatus, EquipmentType } from '../../types/equipment'
+import {
+  getEquipmentStatusLabel,
+  getEquipmentTypeLabel,
+  type Equipment,
+  type EquipmentLocationOption,
+  type EquipmentStatus,
+  type EquipmentType,
+} from '../../types/equipment'
 import { FormGrid, FormModal, FullField } from './styles'
 
 export type EquipmentFormMode = 'create' | 'edit'
 
+export interface EquipmentFormValues {
+  name: string
+  type?: EquipmentType
+  model?: string
+  status?: EquipmentStatus
+  locationId?: string
+  serialNumber?: string
+  notes?: string
+}
+
 interface EquipmentFormModalProps {
   equipment?: Equipment
+  confirmLoading?: boolean
   mode: EquipmentFormMode
   open: boolean
-  locationOptions: string[]
+  locationOptions: EquipmentLocationOption[]
   statusOptions: EquipmentStatus[]
   typeOptions: EquipmentType[]
   onCancel: () => void
-  onSubmit: () => void
+  onSubmit: (values: EquipmentFormValues) => void
 }
 
-const emptyEquipmentForm = {
+const emptyEquipmentForm: Partial<EquipmentFormValues> = {
   name: '',
   type: undefined,
   model: '',
   status: undefined,
-  location: undefined,
+  locationId: undefined,
   serialNumber: '',
-  observations: '',
+  notes: '',
 }
 
 export function EquipmentFormModal({
   equipment,
+  confirmLoading,
   mode,
   open,
   locationOptions,
@@ -42,17 +61,30 @@ export function EquipmentFormModal({
   useEffect(() => {
     if (open) {
       form.resetFields()
-      form.setFieldsValue(emptyEquipmentForm)
+      form.setFieldsValue(
+        equipment
+          ? {
+              name: equipment.name,
+              type: equipment.type,
+              model: equipment.model,
+              status: equipment.status,
+              locationId: equipment.locationId ?? undefined,
+              serialNumber: equipment.serialNumber,
+              notes: equipment.notes ?? '',
+            }
+          : emptyEquipmentForm,
+      )
     }
-  }, [form, open])
+  }, [equipment, form, open])
 
   function handleSubmit() {
     form
       .validateFields()
-      .then(() => {
-        onSubmit();
+      .then((values: EquipmentFormValues) => {
+        // Fluxo da aula: formulário -> payload -> service -> API -> atualização da tela.
+        onSubmit(values)
       })
-      .catch(() => undefined);
+      .catch(() => undefined)
   }
 
   return (
@@ -63,6 +95,7 @@ export function EquipmentFormModal({
       title={isEditing ? "Editar equipamento" : "Novo equipamento"}
       okText="Salvar"
       cancelText="Cancelar"
+      confirmLoading={confirmLoading}
       width={800}
       styles={{
         mask: { backdropFilter: "blur(2px)", background: "rgb(0 0 0 / 45%)" },
@@ -85,14 +118,14 @@ export function EquipmentFormModal({
               { required: true, message: "Informe o nome do equipamento." },
             ]}
           >
-            <Input placeholder="Ex: SN-12345" />
+            <Input placeholder="Ex: Notebook Dell" />
           </Form.Item>
 
           <Form.Item label="Tipo" name="type">
             <Select
               placeholder="Selecione o tipo..."
               options={typeOptions.map((type) => ({
-                label: type,
+                label: getEquipmentTypeLabel(type),
                 value: type,
               }))}
             />
@@ -106,12 +139,13 @@ export function EquipmentFormModal({
             <Input placeholder="Ex: SN-12345" />
           </Form.Item>
 
-          <Form.Item label="Localização" name="location">
+          <Form.Item label="Localização" name="locationId">
             <Select
+              allowClear
               placeholder="Selecione o local..."
               options={locationOptions.map((location) => ({
-                label: location,
-                value: location,
+                label: location.label,
+                value: location.id,
               }))}
             />
           </Form.Item>
@@ -120,19 +154,19 @@ export function EquipmentFormModal({
             <Select
               placeholder="Selecione o status..."
               options={statusOptions.map((status) => ({
-                label: status,
+                label: getEquipmentStatusLabel(status),
                 value: status,
               }))}
             />
           </Form.Item>
 
           <FullField>
-            <Form.Item label="Observações" name="observations">
+            <Form.Item label="Observações" name="notes">
               <Input.TextArea placeholder="Informações adicionais sobre o equipamento..." />
             </Form.Item>
           </FullField>
         </FormGrid>
       </Form>
     </FormModal>
-  );
+  )
 }

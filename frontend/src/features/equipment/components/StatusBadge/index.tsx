@@ -1,4 +1,4 @@
-import type { EquipmentStatus } from '../../types/equipment'
+import { getEquipmentStatusLabel, type EquipmentStatus } from '../../types/equipment'
 import { StatusTag } from './styles'
 
 interface StatusBadgeProps {
@@ -6,5 +6,5 @@ interface StatusBadgeProps {
 }
 
 export function StatusBadge({ status }: StatusBadgeProps) {
-  return <StatusTag $status={status}>{status}</StatusTag>
+  return <StatusTag $status={status}>{getEquipmentStatusLabel(status)}</StatusTag>
 }

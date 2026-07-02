@@ -1,4 +1,5 @@
 import type { EquipmentHistoryItem } from '../../types/equipment'
+import { formatEquipmentDate } from '../../types/equipment'
 import { DateText, Description, Event, EventTitle, HistoryCard, Timeline, Title } from './styles'
 
 interface EquipmentHistoryCardProps {
@@ -13,7 +14,7 @@ export function EquipmentHistoryCard({ history }: EquipmentHistoryCardProps) {
       <Timeline>
         {history.map((event) => (
           <Event key={event.id}>
-            <DateText>{event.date}</DateText>
+            <DateText>{formatEquipmentDate(event.createdAt)}</DateText>
             <EventTitle>{event.title}</EventTitle>
             <Description>{event.description}</Description>
           </Event>

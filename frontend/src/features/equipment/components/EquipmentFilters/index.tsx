@@ -1,6 +1,11 @@
 import SearchOutlined from '@mui/icons-material/SearchOutlined'
 import { Button, Input, Select } from 'antd'
-import type { EquipmentStatus, EquipmentType } from '../../types/equipment'
+import {
+  getEquipmentStatusLabel,
+  getEquipmentTypeLabel,
+  type EquipmentStatus,
+  type EquipmentType,
+} from '../../types/equipment'
 import { Field, FieldLabel, FilterCard, FiltersGrid } from './styles'
 
 interface EquipmentFiltersProps {
@@ -52,7 +57,7 @@ export function EquipmentFilters({
             // O Select chama esta função quando o usuário escolhe ou limpa um status.
             onChange={(value?: EquipmentStatus) => onStatusChange(value)}
             options={statusOptions.map((status) => ({
-              label: status,
+              label: getEquipmentStatusLabel(status),
               value: status,
             }))}
             style={{ width: '100%' }}
@@ -68,7 +73,7 @@ export function EquipmentFilters({
             // O tipo também fica salvo na página principal.
             onChange={(value?: EquipmentType) => onTypeChange(value)}
             options={typeOptions.map((type) => ({
-              label: type,
+              label: getEquipmentTypeLabel(type),
               value: type,
             }))}
             style={{ width: '100%' }}

@@ -7,11 +7,11 @@ interface StatusTagProps {
 }
 
 function getTextColor(status: EquipmentStatus) {
-  if (status === 'Disponível') {
+  if (status === 'AVAILABLE') {
     return '#007c8c'
   }
 
-  if (status === 'Em manutenção') {
+  if (status === 'IN_MAINTENANCE') {
     return '#002a64'
   }
 
@@ -19,11 +19,11 @@ function getTextColor(status: EquipmentStatus) {
 }
 
 function getBackgroundColor(status: EquipmentStatus) {
-  if (status === 'Disponível') {
+  if (status === 'AVAILABLE') {
     return '#e6fffb'
   }
 
-  if (status === 'Em manutenção') {
+  if (status === 'IN_MAINTENANCE') {
     return '#e6f4ff'
   }
 
@@ -31,11 +31,11 @@ function getBackgroundColor(status: EquipmentStatus) {
 }
 
 function getBorderColor(status: EquipmentStatus) {
-  if (status === 'Disponível') {
+  if (status === 'AVAILABLE') {
     return '#b5f5ec'
   }
 
-  if (status === 'Em manutenção') {
+  if (status === 'IN_MAINTENANCE') {
     return '#bae0ff'
   }
 

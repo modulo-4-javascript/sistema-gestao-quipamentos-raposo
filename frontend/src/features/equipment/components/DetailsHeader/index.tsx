@@ -43,7 +43,7 @@ export function DetailsHeader({
           <StatusBadge status={equipment.status} />
         </TitleRow>
 
-        <Code>{equipment.id}</Code>
+        <Code>{equipment.code}</Code>
       </TitleGroup>
 
       <Actions>

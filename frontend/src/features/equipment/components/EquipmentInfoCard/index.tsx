@@ -1,4 +1,8 @@
-import type { EquipmentDetail } from '../../types/equipment'
+import {
+  formatEquipmentDate,
+  getEquipmentTypeLabel,
+  type EquipmentDetail,
+} from '../../types/equipment'
 import {
   Avatar,
   DescriptionList,
@@ -15,6 +19,10 @@ interface EquipmentInfoCardProps {
 }
 
 export function EquipmentInfoCard({ equipment }: EquipmentInfoCardProps) {
+  const responsibleLabel = equipment.responsibleUserId
+    ? `Usuário ${equipment.responsibleUserId.slice(0, 8)}`
+    : 'Equipe de patrimônio'
+
   return (
     <InfoCard styles={{ body: { padding: 24 } }}>
       <Title>Informações gerais</Title>
@@ -22,42 +30,42 @@ export function EquipmentInfoCard({ equipment }: EquipmentInfoCardProps) {
       <DescriptionList>
         <Detail>
           <Term>Tipo</Term>
-          <Value>{equipment.type}</Value>
+          <Value>{getEquipmentTypeLabel(equipment.type)}</Value>
         </Detail>
 
         <Detail>
           <Term>Modelo</Term>
-          <Value>{equipment.model}</Value>
+          <Value>{equipment.model ?? 'Não informado'}</Value>
         </Detail>
 
         <Detail>
           <Term>S/N (Serial Number)</Term>
-          <Value>{equipment.serialNumber}</Value>
+          <Value>{equipment.serialNumber ?? 'Não informado'}</Value>
         </Detail>
 
         <Detail>
           <Term>Localização</Term>
-          <Value>{equipment.location}</Value>
+          <Value>{equipment.locationName ?? 'Sem localização'}</Value>
         </Detail>
 
         <Detail>
           <Term>Responsável</Term>
           <Value>
             <Responsible>
-              <Avatar>{equipment.responsible.initials}</Avatar>
-              {equipment.responsible.name}
+              <Avatar>EP</Avatar>
+              {responsibleLabel}
             </Responsible>
           </Value>
         </Detail>
 
         <Detail>
           <Term>Data de cadastro</Term>
-          <Value>{equipment.createdAt}</Value>
+          <Value>{formatEquipmentDate(equipment.createdAt)}</Value>
         </Detail>
 
         <Detail>
           <Term>Última atualização</Term>
-          <Value>{equipment.lastUpdate}</Value>
+          <Value>{formatEquipmentDate(equipment.updatedAt)}</Value>
         </Detail>
       </DescriptionList>
     </InfoCard>
