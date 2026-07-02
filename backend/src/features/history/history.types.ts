@@ -16,7 +16,7 @@ export type HistoryItem = {
   toLocationId?: string | null;
   title: string;
   description: string;
-  userId?: string | null;
+  userName?: string | null;
   createdAt: string;
 };
 

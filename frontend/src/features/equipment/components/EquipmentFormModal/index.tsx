@@ -18,6 +18,7 @@ export interface EquipmentFormValues {
   model?: string
   status?: EquipmentStatus
   locationId?: string
+  responsibleUserName?: string
   serialNumber?: string
   notes?: string
 }
@@ -40,6 +41,7 @@ const emptyEquipmentForm: Partial<EquipmentFormValues> = {
   model: '',
   status: undefined,
   locationId: undefined,
+  responsibleUserName: '',
   serialNumber: '',
   notes: '',
 }
@@ -69,6 +71,7 @@ export function EquipmentFormModal({
               model: equipment.model,
               status: equipment.status,
               locationId: equipment.locationId ?? undefined,
+              responsibleUserName: equipment.responsibleUserName ?? '',
               serialNumber: equipment.serialNumber,
               notes: equipment.notes ?? '',
             }
@@ -158,6 +161,10 @@ export function EquipmentFormModal({
                 value: status,
               }))}
             />
+          </Form.Item>
+
+          <Form.Item label="Responsável" name="responsibleUserName">
+            <Input placeholder="Ex: Equipe de patrimônio" />
           </Form.Item>
 
           <FullField>

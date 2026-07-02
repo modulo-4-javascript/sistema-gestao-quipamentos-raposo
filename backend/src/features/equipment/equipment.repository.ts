@@ -19,7 +19,7 @@ function rowToEquipment(row: QueryResultRow): Equipment {
     serialNumber: row.serial_number ?? undefined,
     status: row.status,
     locationId: row.location_id,
-    responsibleUserId: row.responsible_user_id,
+    responsibleUserName: row.responsible_user_name,
     notes: row.notes,
     createdAt: new Date(row.created_at).toISOString(),
     updatedAt: new Date(row.updated_at).toISOString()
@@ -74,7 +74,7 @@ export class EquipmentRepository {
         `
         INSERT INTO equipment (
           id, code, name, type, model, serial_number, status, location_id,
-          responsible_user_id, notes, created_at, updated_at
+          responsible_user_name, notes, created_at, updated_at
         )
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
         RETURNING *
@@ -88,7 +88,7 @@ export class EquipmentRepository {
           equipment.serialNumber ?? null,
           equipment.status,
           equipment.locationId ?? null,
-          equipment.responsibleUserId ?? null,
+          equipment.responsibleUserName ?? null,
           equipment.notes ?? null,
           equipment.createdAt,
           equipment.updatedAt
@@ -118,7 +118,7 @@ export class EquipmentRepository {
         serialNumber: "serial_number",
         status: "status",
         locationId: "location_id",
-        responsibleUserId: "responsible_user_id",
+        responsibleUserName: "responsible_user_name",
         notes: "notes",
         createdAt: "created_at",
         updatedAt: "updated_at"

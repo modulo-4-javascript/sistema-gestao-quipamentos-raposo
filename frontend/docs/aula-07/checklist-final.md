@@ -2,11 +2,15 @@
 
 ## O que precisa funcionar no fim da aula
 
-- [ ] Backend rodando localmente.
+- [ ] `npm run dev` executado dentro de `frontend`.
+- [ ] Backend rodando localmente a partir do script do frontend.
+- [ ] PostgreSQL subindo com Docker Compose.
+- [ ] `backend/.env` configurado com `DATABASE_URL`.
+- [ ] `frontend/.env` configurado com `VITE_API_PROXY_TARGET`.
 - [ ] Swagger acessível em `http://localhost:3000/docs`.
 - [ ] Frontend rodando em `http://localhost:5173/equipment`.
 - [ ] Frontend configurado com `VITE_API_URL=/api/v1`.
-- [ ] Proxy do Vite apontando para a porta correta do backend.
+- [ ] Proxy do Vite apontando automaticamente para a porta correta do backend.
 - [ ] Listagem de equipamentos carregando da API.
 - [ ] Cards de resumo carregando da API.
 - [ ] Loading aparecendo durante carregamento.
@@ -24,6 +28,7 @@
 
 - [ ] Diferença entre mock e API real.
 - [ ] O que é URL base da API.
+- [ ] O que o script `frontend/scripts/dev.mjs` prepara antes do Vite.
 - [ ] O que é `GET`, `POST`, `PUT` e `PATCH`.
 - [ ] Por que existe uma camada de service.
 - [ ] Por que usamos types/interfaces.

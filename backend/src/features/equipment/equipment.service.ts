@@ -106,7 +106,7 @@ export class EquipmentService {
       serialNumber: input.serialNumber,
       status: input.status ?? EquipmentStatus.AVAILABLE,
       locationId: input.locationId ?? null,
-      responsibleUserId: input.responsibleUserId ?? null,
+      responsibleUserName: input.responsibleUserName ?? null,
       notes: input.notes ?? null,
       createdAt: now,
       updatedAt: now

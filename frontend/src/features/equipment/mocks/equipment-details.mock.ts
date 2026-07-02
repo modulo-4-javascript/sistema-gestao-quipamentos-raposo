@@ -19,7 +19,7 @@ export const equipmentDetailsMock: EquipmentDetail[] = [
     locationId: '11111111-1111-4111-8111-111111111111',
     locationName: 'LAB-01 - Lab 01',
     serialNumber: 'DL-5420-2026',
-    responsibleUserId: null,
+    responsibleUserName: 'Equipe de patrimônio',
     createdAt: '2026-01-15T10:00:00.000Z',
     updatedAt: '2026-01-15T10:00:00.000Z',
     notes:
@@ -53,7 +53,7 @@ export const equipmentDetailsMock: EquipmentDetail[] = [
     locationId: '11111111-1111-4111-8111-111111111111',
     locationName: 'LAB-01 - Lab 01',
     serialNumber: 'LG-29-042',
-    responsibleUserId: null,
+    responsibleUserName: 'Equipe de patrimônio',
     createdAt: '2026-01-15T10:05:00.000Z',
     updatedAt: '2026-01-15T10:05:00.000Z',
     notes: 'Monitor usado junto à estação do professor.',
@@ -87,7 +87,7 @@ export function getEquipmentDetailSummary(equipment: EquipmentDetail): Equipment
     {
       id: 'responsible',
       title: 'Responsável',
-      value: 'Equipe de patrimônio',
+      value: equipment.responsibleUserName ?? 'Equipe de patrimônio',
       description: 'Pessoa de referência',
     },
     {

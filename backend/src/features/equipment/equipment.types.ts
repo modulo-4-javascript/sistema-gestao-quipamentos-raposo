@@ -24,7 +24,7 @@ export type Equipment = {
   serialNumber?: string;
   status: EquipmentStatus;
   locationId?: string | null;
-  responsibleUserId?: string | null;
+  responsibleUserName?: string | null;
   notes?: string | null;
   createdAt: string;
   updatedAt: string;
@@ -48,7 +48,7 @@ export type CreateEquipmentInput = {
   serialNumber?: string;
   status?: EquipmentStatus;
   locationId?: string | null;
-  responsibleUserId?: string | null;
+  responsibleUserName?: string | null;
   notes?: string | null;
 };
 

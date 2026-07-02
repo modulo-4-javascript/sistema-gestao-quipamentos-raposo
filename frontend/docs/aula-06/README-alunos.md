@@ -252,7 +252,7 @@ Campos principais:
 - `status`: situação atual;
 - `location`: localização;
 - `serialNumber`: número de série;
-- `responsible`: pessoa responsável;
+- `responsibleUserName`: nome da pessoa ou equipe responsável;
 - `createdAt`: data de cadastro;
 - `lastUpdate`: última atualização;
 - `notes`: observações;

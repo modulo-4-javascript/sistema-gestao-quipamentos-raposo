@@ -103,10 +103,7 @@ Exemplo de resposta:
   "location": "Laboratório 01",
   "lastUpdate": "Hoje às 14:35",
   "serialNumber": "DL-5420-2026",
-  "responsible": {
-    "initials": "JS",
-    "name": "João Silva"
-  },
+  "responsibleUserName": "João Silva",
   "createdAt": "15/01/2023",
   "notes": "Equipamento disponível para uso em aulas práticas.",
   "history": [
@@ -123,8 +120,8 @@ Exemplo de resposta:
 Campos usados na tela de detalhes:
 
 - cabeçalho: `name`, `id`, `status`;
-- cards: `status`, `location`, `responsible`, `lastUpdate`;
-- informações gerais: `type`, `model`, `serialNumber`, `location`, `responsible`, `createdAt`, `lastUpdate`;
+- cards: `status`, `location`, `responsibleUserName`, `lastUpdate`;
+- informações gerais: `type`, `model`, `serialNumber`, `location`, `responsibleUserName`, `createdAt`, `lastUpdate`;
 - observações: `notes`;
 - histórico: `history`.
 

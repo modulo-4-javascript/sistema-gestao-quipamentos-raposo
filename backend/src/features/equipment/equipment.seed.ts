@@ -20,6 +20,7 @@ export const equipmentSeed: Equipment[] = [
     serialNumber: "DL-5420-2026",
     status: EquipmentStatus.AVAILABLE,
     locationId: LOCATION_SEED_IDS.lab01,
+    responsibleUserName: "Equipe de patrimonio",
     notes: "Equipment available for practical classes.",
     createdAt: "2026-01-15T10:00:00.000Z",
     updatedAt: "2026-01-15T10:00:00.000Z"
@@ -33,6 +34,7 @@ export const equipmentSeed: Equipment[] = [
     serialNumber: "LG-29-2026",
     status: EquipmentStatus.AVAILABLE,
     locationId: LOCATION_SEED_IDS.lab01,
+    responsibleUserName: "Equipe de patrimonio",
     notes: "Monitor used with the instructor workstation.",
     createdAt: "2026-01-15T10:05:00.000Z",
     updatedAt: "2026-01-15T10:05:00.000Z"
@@ -46,6 +48,7 @@ export const equipmentSeed: Equipment[] = [
     serialNumber: "HP-LJ-2026",
     status: EquipmentStatus.IN_MAINTENANCE,
     locationId: LOCATION_SEED_IDS.maintenance,
+    responsibleUserName: "Equipe de manutencao",
     notes: "Waiting for toner replacement.",
     createdAt: "2026-01-15T10:10:00.000Z",
     updatedAt: "2026-01-15T10:10:00.000Z"
@@ -59,6 +62,7 @@ export const equipmentSeed: Equipment[] = [
     serialNumber: "NET-RTR-2026",
     status: EquipmentStatus.AVAILABLE,
     locationId: LOCATION_SEED_IDS.network,
+    responsibleUserName: "Equipe de infraestrutura",
     notes: "Backup router for lab network.",
     createdAt: "2026-01-15T10:15:00.000Z",
     updatedAt: "2026-01-15T10:15:00.000Z"
@@ -72,6 +76,7 @@ export const equipmentSeed: Equipment[] = [
     serialNumber: "KEY-KIT-2026",
     status: EquipmentStatus.AVAILABLE,
     locationId: LOCATION_SEED_IDS.storage,
+    responsibleUserName: "Equipe de patrimonio",
     notes: "Spare keyboard and mouse kit.",
     createdAt: "2026-01-15T10:20:00.000Z",
     updatedAt: "2026-01-15T10:20:00.000Z"
@@ -85,6 +90,7 @@ export const equipmentSeed: Equipment[] = [
     serialNumber: "EPS-X39-2026",
     status: EquipmentStatus.INACTIVE,
     locationId: LOCATION_SEED_IDS.storage,
+    responsibleUserName: "Equipe de patrimonio",
     notes: "Older projector kept as backup.",
     createdAt: "2026-01-15T10:25:00.000Z",
     updatedAt: "2026-01-15T10:25:00.000Z"

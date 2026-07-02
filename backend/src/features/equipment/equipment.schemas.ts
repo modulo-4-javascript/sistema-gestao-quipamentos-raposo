@@ -35,7 +35,7 @@ export const createEquipmentBodySchema = z
     serialNumber: z.string().trim().max(80).optional(),
     status: z.nativeEnum(EquipmentStatus).default(EquipmentStatus.AVAILABLE),
     locationId: z.string().uuid().nullable().optional(),
-    responsibleUserId: z.string().uuid().nullable().optional(),
+    responsibleUserName: nullableText(120),
     notes: nullableText(1000)
   })
   .strict();
@@ -48,7 +48,7 @@ export const updateEquipmentBodySchema = z
     serialNumber: z.string().trim().max(80).optional(),
     status: z.nativeEnum(EquipmentStatus).optional(),
     locationId: z.string().uuid().nullable().optional(),
-    responsibleUserId: z.string().uuid().nullable().optional(),
+    responsibleUserName: nullableText(120),
     notes: nullableText(1000)
   })
   .strict()

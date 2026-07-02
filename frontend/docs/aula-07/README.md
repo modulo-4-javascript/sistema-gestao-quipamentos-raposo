@@ -30,43 +30,78 @@ A exclusão não será o foco desta aula. Ela fica como evolução futura para n
 
 - Node.js LTS instalado;
 - npm instalado;
-- Docker Desktop instalado e aberto;
-- dependências do backend e frontend instaladas;
+- Docker Desktop instalado;
+- dependencias do frontend instaladas com `npm install`;
 - noção básica de componentes, props, estado e rotas do React.
 
-## Como rodar o backend
+## Como rodar a aula
 
-Entre na pasta do backend:
+Nesta aula, o caminho principal e rodar tudo a partir do frontend.
+
+Entre na pasta do frontend:
 
 ```bash
-cd backend
+cd frontend
 ```
 
-Instale as dependências, se necessário:
+Instale as dependencias, se necessario:
 
 ```bash
 npm install
 ```
 
-Crie o `.env` a partir do exemplo, se ainda não existir:
-
-```bash
-cp .env.example .env
-```
-
-Suba o banco PostgreSQL:
-
-```bash
-npm run db:up
-```
-
-Rode a API:
+Rode:
 
 ```bash
 npm run dev
 ```
 
-Também existe o caminho simplificado:
+Esse comando faz mais do que abrir o Vite:
+
+- verifica/cria a configuracao local do backend;
+- configura `backend/.env` com `DATABASE_URL`;
+- sobe o PostgreSQL com Docker Compose;
+- espera o banco ficar pronto;
+- inicia a API;
+- cria/atualiza `frontend/.env`;
+- inicia o frontend.
+
+Os logs aparecem no mesmo terminal com tags coloridas:
+
+```txt
+[backend] verde: logs da API
+[frontend] azul: logs do Vite
+[dev] ciano: mensagens do script que prepara o ambiente
+```
+
+Se o Docker Desktop estiver fechado, o script tenta abrir. Se ele nao conseguir iniciar a tempo, abra o Docker Desktop manualmente e rode o comando de novo.
+
+Abra:
+
+```txt
+http://localhost:5173/equipment
+```
+
+Enderecos esperados:
+
+```txt
+Frontend: http://localhost:5173/equipment
+API:      http://localhost:3000/api/v1
+Swagger:  http://localhost:3000/docs
+Health:   http://localhost:3000/health
+```
+
+Se a porta `3000` estiver ocupada, o script escolhe outra porta para a API e atualiza o proxy do frontend.
+
+## Como rodar o backend manualmente
+
+Se precisar demonstrar o backend separado, entre na pasta do backend:
+
+```bash
+cd backend
+```
+
+Use o script simplificado:
 
 ```bash
 ./start.sh
@@ -78,46 +113,22 @@ No Windows, use:
 start.bat
 ```
 
-Endereços esperados:
-
-```txt
-API: http://localhost:3000/api/v1
-Swagger: http://localhost:3000/docs
-Health check: http://localhost:3000/health
-```
-
-Se o script escolher outra porta, anote a porta exibida no terminal.
-
-## Como rodar o frontend
-
-Em outro terminal, entre na pasta do frontend:
-
-```bash
-cd frontend
-```
-
-Instale as dependências, se necessário:
+Ou rode manualmente:
 
 ```bash
 npm install
-```
-
-Crie o `.env` a partir do exemplo:
-
-```bash
 cp .env.example .env
-```
-
-Rode o projeto:
-
-```bash
+npm run db:up
 npm run dev
 ```
 
-Abra:
+## Como rodar apenas o frontend
 
-```txt
-http://localhost:5173/equipment
+Normalmente voce nao precisa deste comando na aula. Use apenas se a API ja estiver rodando.
+
+```bash
+cd frontend
+npm run dev:vite
 ```
 
 ## Variáveis de ambiente do frontend
@@ -128,7 +139,7 @@ Arquivo:
 frontend/.env
 ```
 
-Conteúdo esperado:
+Conteudo esperado:
 
 ```env
 VITE_API_URL=/api/v1
@@ -143,7 +154,9 @@ Nesta aula usamos `/api/v1`, porque o Vite encaminha essa chamada para o backend
 frontend/vite.config.ts
 ```
 
-Se o backend estiver em outra porta, ajuste:
+Na maioria dos casos, os alunos nao precisam editar esse arquivo manualmente. O `npm run dev` atualiza `VITE_API_PROXY_TARGET` quando a API precisa subir em outra porta.
+
+Se estiver rodando tudo manualmente e o backend estiver em outra porta, ajuste:
 
 ```env
 VITE_API_PROXY_TARGET=http://localhost:3001

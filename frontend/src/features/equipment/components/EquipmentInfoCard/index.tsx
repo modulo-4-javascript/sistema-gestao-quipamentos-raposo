@@ -19,9 +19,7 @@ interface EquipmentInfoCardProps {
 }
 
 export function EquipmentInfoCard({ equipment }: EquipmentInfoCardProps) {
-  const responsibleLabel = equipment.responsibleUserId
-    ? `Usuário ${equipment.responsibleUserId.slice(0, 8)}`
-    : 'Equipe de patrimônio'
+  const responsibleLabel = equipment.responsibleUserName ?? 'Equipe de patrimônio'
 
   return (
     <InfoCard styles={{ body: { padding: 24 } }}>
@@ -52,7 +50,7 @@ export function EquipmentInfoCard({ equipment }: EquipmentInfoCardProps) {
           <Term>Responsável</Term>
           <Value>
             <Responsible>
-              <Avatar>EP</Avatar>
+              <Avatar>{responsibleLabel.slice(0, 2).toUpperCase()}</Avatar>
               {responsibleLabel}
             </Responsible>
           </Value>

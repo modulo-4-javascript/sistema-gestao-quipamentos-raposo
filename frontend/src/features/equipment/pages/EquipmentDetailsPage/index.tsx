@@ -47,6 +47,7 @@ function buildEquipmentPayload(values: EquipmentFormValues): CreateEquipmentPayl
     serialNumber: values.serialNumber?.trim() || undefined,
     status: values.status,
     locationId: values.locationId ?? null,
+    responsibleUserName: values.responsibleUserName?.trim() || null,
     notes: values.notes?.trim() || null,
   }
 }
@@ -68,7 +69,7 @@ function buildDetailSummary(equipment: EquipmentDetail): EquipmentDetailSummary[
     {
       id: 'responsible',
       title: 'Responsável',
-      value: 'Equipe de patrimônio',
+      value: equipment.responsibleUserName ?? 'Equipe de patrimônio',
       description: 'Pessoa de referência',
     },
     {

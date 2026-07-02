@@ -589,8 +589,10 @@ components:
         - $ref: '#/components/schemas/Equipment'
         - type: object
           properties:
-            responsibleUser:
-              $ref: '#/components/schemas/User'
+            responsibleUserName:
+              type: string
+              nullable: true
+              example: Equipe de patrimonio
             createdAt:
               type: string
               format: date-time
@@ -629,6 +631,11 @@ components:
           type: string
           format: uuid
           nullable: true
+        responsibleUserName:
+          type: string
+          maxLength: 120
+          nullable: true
+          example: Equipe de patrimonio
         status:
           $ref: '#/components/schemas/EquipmentStatus'
         notes:
@@ -786,8 +793,10 @@ components:
           type: string
           format: date-time
           example: '2026-06-25T14:35:00Z'
-        user:
-          $ref: '#/components/schemas/User'
+        userName:
+          type: string
+          nullable: true
+          example: Equipe de patrimonio
     LocationEquipmentHistoryItem:
       type: object
       description: Representa um evento de equipamento relacionado a uma localização.
@@ -812,21 +821,10 @@ components:
           type: string
           format: date-time
           example: '2026-06-25T14:35:00Z'
-        user:
-          $ref: '#/components/schemas/User'
-    User:
-      type: object
-      description: Usuário responsável por uma ação ou alteração no sistema.
-      properties:
-        id:
+        userName:
           type: string
-          format: uuid
-        name:
-          type: string
-          example: John Silva
-        initials:
-          type: string
-          example: JS
+          nullable: true
+          example: Equipe de patrimonio
     PaginatedEquipmentResponse:
       type: object
       description: Resposta paginada usada nas listagens de equipamentos.

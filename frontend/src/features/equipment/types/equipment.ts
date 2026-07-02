@@ -24,7 +24,7 @@ export interface Equipment {
   status: EquipmentStatus
   locationId?: string | null
   locationName?: string
-  responsibleUserId?: string | null
+  responsibleUserName?: string | null
   notes?: string | null
   createdAt: string
   updatedAt: string
@@ -54,7 +54,7 @@ export interface EquipmentHistoryItem {
   toLocationId?: string | null
   title: string
   description: string
-  userId?: string | null
+  userName?: string | null
   createdAt: string
 }
 
@@ -81,7 +81,7 @@ export interface CreateEquipmentPayload {
   serialNumber?: string
   status?: EquipmentStatus
   locationId?: string | null
-  responsibleUserId?: string | null
+  responsibleUserName?: string | null
   notes?: string | null
 }
 

@@ -22,7 +22,7 @@ function rowToHistoryItem(row: QueryResultRow): HistoryItem {
     toLocationId: row.to_location_id,
     title: row.title,
     description: row.description,
-    userId: row.user_id,
+    userName: row.user_name,
     createdAt: new Date(row.created_at).toISOString()
   };
 }
@@ -88,7 +88,7 @@ export class HistoryRepository {
         `
         INSERT INTO equipment_history (
           id, type, equipment_id, from_location_id, to_location_id, title,
-          description, user_id, created_at
+          description, user_name, created_at
         )
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
         RETURNING *
@@ -101,7 +101,7 @@ export class HistoryRepository {
           item.toLocationId ?? null,
           item.title,
           item.description,
-          item.userId ?? null,
+          item.userName ?? null,
           item.createdAt
         ]
       );

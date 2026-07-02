@@ -7,8 +7,8 @@ Tempo total sugerido: 2h20 a 2h40.
 | Etapa | Tempo | Objetivo |
 | --- | ---: | --- |
 | Abertura e contexto | 10 min | Relembrar Aula 06 e explicar a troca de mock por API |
-| Backend local | 15 min | Rodar API, banco e Swagger |
-| Configuração do frontend | 10 min | Explicar `.env`, proxy do Vite e URL base |
+| Setup integrado | 15 min | Rodar `npm run dev` no frontend e observar API + banco subindo |
+| Configuração automática | 10 min | Explicar `.env`, proxy do Vite, URL base e banco local |
 | Service e types | 20 min | Mostrar `api.ts`, `equipmentService.ts` e `equipment.ts` |
 | Listagem | 25 min | Buscar equipamentos, loading, erro e vazio |
 | Detalhe | 20 min | Ler ID da rota e buscar um equipamento |
@@ -35,6 +35,8 @@ Frontend:
 
 ```txt
 frontend/.env.example
+frontend/package.json
+frontend/scripts/dev.mjs
 frontend/vite.config.ts
 frontend/src/services/api.ts
 frontend/src/features/equipment/types/equipment.ts
@@ -47,8 +49,8 @@ frontend/src/features/equipment/components/EquipmentStatusModal/index.tsx
 
 ## Pausas recomendadas
 
-1. Depois de rodar o backend: todos devem abrir `http://localhost:3000/docs`.
-2. Depois de configurar o frontend: todos devem abrir `http://localhost:5173/equipment`.
+1. Depois de rodar `npm run dev` em `frontend`: todos devem abrir `http://localhost:5173/equipment`.
+2. Depois do terminal mostrar a API: todos devem abrir `http://localhost:3000/docs`.
 3. Depois de explicar `api.ts`: pedir que os alunos localizem `VITE_API_URL`.
 4. Depois da listagem: pedir que filtrem por status e observem a chamada.
 5. Depois do detalhe: pedir que abram uma URL com ID inválido.
@@ -66,6 +68,17 @@ Explique:
 - por que usamos `fetch`;
 - por que respostas `204` não têm corpo;
 - como o erro da API vira `ApiError`.
+
+### `frontend/scripts/dev.mjs`
+
+Explique:
+
+- por que o `npm run dev` agora sobe frontend e backend;
+- como o script cria/atualiza `backend/.env`;
+- como o script sobe o PostgreSQL via Docker Compose;
+- como o script atualiza `frontend/.env` com `VITE_API_PROXY_TARGET`;
+- como ler os logs por tag colorida: `[backend]`, `[frontend]` e `[dev]`;
+- quando usar `npm run dev:vite` para subir apenas o frontend.
 
 ### `frontend/src/features/equipment/services/equipmentService.ts`
 
@@ -110,15 +123,17 @@ Explique:
 - O backend usa enums em inglês: `AVAILABLE`, `IN_MAINTENANCE`, `NOTEBOOK`.
 - A interface mostra rótulos em português usando funções de label.
 - A rota de detalhes usa UUID, não mais `EQP-001`.
-- O frontend usa `/api/v1` e o Vite proxy envia para `http://localhost:3000`.
-- Se o backend subir em outra porta, atualizar `VITE_API_PROXY_TARGET`.
+- O frontend usa `/api/v1` e o Vite proxy envia para a porta da API.
+- O `npm run dev` do frontend atualiza `VITE_API_PROXY_TARGET` automaticamente.
+- Se a API ja estiver rodando, o script reaproveita a API existente.
 - Não transformar Localizações em implementação pronta durante a aula.
 
 ## Erros comuns
 
 - Docker Desktop fechado;
 - porta `3000` ocupada;
-- esquecer de criar `.env` no frontend;
+- Docker Desktop instalado, mas ainda inicializando;
+- tentar rodar `npm run dev:vite` sem API rodando;
 - usar `VITE_API_URL=http://localhost:3000/api/v1` e bater em CORS;
 - tentar abrir `/equipment/EQP-001` depois da integração, quando a API espera UUID;
 - mandar status em português para a API;

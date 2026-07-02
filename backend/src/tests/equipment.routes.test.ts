@@ -29,7 +29,8 @@ describe("Equipment routes", () => {
       name: "Lenovo Notebook",
       type: "NOTEBOOK",
       model: "ThinkPad E14",
-      locationId: LOCATION_SEED_IDS.lab02
+      locationId: LOCATION_SEED_IDS.lab02,
+      responsibleUserName: "Equipe de patrimonio"
     });
 
     expect(response.status).toBe(201);
@@ -38,9 +39,23 @@ describe("Equipment routes", () => {
       name: "Lenovo Notebook",
       type: "NOTEBOOK",
       status: "AVAILABLE",
-      locationId: LOCATION_SEED_IDS.lab02
+      locationId: LOCATION_SEED_IDS.lab02,
+      responsibleUserName: "Equipe de patrimonio"
     });
     expect(response.body.id).toEqual(expect.any(String));
+  });
+
+  it("rejects responsible user as object", async () => {
+    const response = await request(app).post("/api/v1/equipment").send({
+      name: "Dell Mouse",
+      type: "PERIPHERAL",
+      responsibleUser: {
+        name: "Equipe de patrimonio"
+      }
+    });
+
+    expect(response.status).toBe(422);
+    expect(response.body.code).toBe("VALIDATION_ERROR");
   });
 
   it("validates equipment creation without name", async () => {
