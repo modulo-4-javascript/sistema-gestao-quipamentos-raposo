@@ -1,19 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
-import { equipmentService, type ListEquipmentParams } from '../services/equipmentService'
+import { equipmentService, type GetEquipmentListParams } from '../services/equipmentService'
 import type {
   CreateEquipmentPayload,
   UpdateEquipmentPayload,
   UpdateEquipmentStatusPayload,
 } from '../types/equipment'
-
-const equipmentKeys = {
-  all: ['equipment'] as const,
-  detail: (equipmentId?: string) => ['equipment', 'detail', equipmentId] as const,
-  list: (params: ListEquipmentParams) => ['equipment', 'list', params] as const,
-  locations: ['locations', 'options'] as const,
-  summary: ['equipment', 'summary'] as const,
-}
 
 export function getRequestErrorMessage(error: unknown) {
   if (axios.isAxiosError(error)) {
@@ -31,10 +23,10 @@ export function getRequestErrorMessage(error: unknown) {
   return 'Não foi possível completar a comunicação com a API.'
 }
 
-export function useEquipmentList(params: ListEquipmentParams) {
+export function useEquipmentList(params: GetEquipmentListParams) {
   const query = useQuery({
-    queryKey: equipmentKeys.list(params),
-    queryFn: () => equipmentService.list(params),
+    queryKey: ['equipment', params],
+    queryFn: () => equipmentService.getEquipmentList(params),
   })
 
   return {
@@ -45,8 +37,8 @@ export function useEquipmentList(params: ListEquipmentParams) {
 
 export function useEquipmentSummary() {
   const query = useQuery({
-    queryKey: equipmentKeys.summary,
-    queryFn: equipmentService.summary,
+    queryKey: ['equipment', 'summary'],
+    queryFn: equipmentService.getEquipmentSummary,
   })
 
   return {
@@ -55,11 +47,11 @@ export function useEquipmentSummary() {
   }
 }
 
-export function useEquipmentDetail(equipmentId?: string) {
+export function useEquipmentDetails(equipmentId?: string) {
   const query = useQuery({
     enabled: Boolean(equipmentId),
-    queryKey: equipmentKeys.detail(equipmentId),
-    queryFn: () => equipmentService.getById(equipmentId ?? ''),
+    queryKey: ['equipment', equipmentId],
+    queryFn: () => equipmentService.getEquipmentById(equipmentId ?? ''),
   })
 
   return {
@@ -70,8 +62,8 @@ export function useEquipmentDetail(equipmentId?: string) {
 
 export function useEquipmentLocationOptions() {
   const query = useQuery({
-    queryKey: equipmentKeys.locations,
-    queryFn: equipmentService.listLocationOptions,
+    queryKey: ['locations'],
+    queryFn: equipmentService.getEquipmentLocationOptions,
   })
 
   return {
@@ -80,13 +72,12 @@ export function useEquipmentLocationOptions() {
   }
 }
 
-export function useCreateEquipmentMutation() {
+export function useCreateEquipment() {
   const queryClient = useQueryClient()
   const mutation = useMutation({
-    mutationFn: (payload: CreateEquipmentPayload) => equipmentService.create(payload),
+    mutationFn: (payload: CreateEquipmentPayload) => equipmentService.createEquipment(payload),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: equipmentKeys.all })
-      void queryClient.invalidateQueries({ queryKey: equipmentKeys.locations })
+      void queryClient.invalidateQueries({ queryKey: ['equipment'] })
     },
   })
 
@@ -96,7 +87,7 @@ export function useCreateEquipmentMutation() {
   }
 }
 
-export function useUpdateEquipmentMutation() {
+export function useUpdateEquipment() {
   const queryClient = useQueryClient()
   const mutation = useMutation({
     mutationFn: ({
@@ -105,10 +96,9 @@ export function useUpdateEquipmentMutation() {
     }: {
       equipmentId: string
       payload: UpdateEquipmentPayload
-    }) => equipmentService.update(equipmentId, payload),
+    }) => equipmentService.updateEquipment(equipmentId, payload),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: equipmentKeys.all })
-      void queryClient.invalidateQueries({ queryKey: equipmentKeys.locations })
+      void queryClient.invalidateQueries({ queryKey: ['equipment'] })
     },
   })
 
@@ -118,7 +108,7 @@ export function useUpdateEquipmentMutation() {
   }
 }
 
-export function useUpdateEquipmentStatusMutation() {
+export function useUpdateEquipmentStatus() {
   const queryClient = useQueryClient()
   const mutation = useMutation({
     mutationFn: ({
@@ -127,9 +117,9 @@ export function useUpdateEquipmentStatusMutation() {
     }: {
       equipmentId: string
       payload: UpdateEquipmentStatusPayload
-    }) => equipmentService.updateStatus(equipmentId, payload),
+    }) => equipmentService.updateEquipmentStatus(equipmentId, payload),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: equipmentKeys.all })
+      void queryClient.invalidateQueries({ queryKey: ['equipment'] })
     },
   })
 

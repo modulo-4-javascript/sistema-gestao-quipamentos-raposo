@@ -1,4 +1,4 @@
-import { api } from '../../../services/api'
+import { axiosApi } from '../../../services/api'
 import type {
   CreateEquipmentPayload,
   Equipment,
@@ -12,7 +12,7 @@ import type {
   UpdateEquipmentStatusPayload,
 } from '../types/equipment'
 
-export interface ListEquipmentParams {
+export interface GetEquipmentListParams {
   search?: string
   status?: EquipmentStatus
   type?: EquipmentType
@@ -29,62 +29,76 @@ interface ApiLocation {
 // Este service é o lugar onde o frontend conversa com o backend.
 // A tela chama funções em TypeScript; o service transforma isso em GET, POST, PUT e PATCH.
 export const equipmentService = {
-  list(params: ListEquipmentParams = {}) {
+  async getEquipmentList(params: GetEquipmentListParams = {}) {
     // GET busca dados. Aqui a API devolve { data, meta } e a tela usa data na tabela.
-    return api
-      .get<PaginatedResult<Equipment>>('/equipment', {
-        params: {
-          page: 1,
-          pageSize: 100,
-          ...params,
-        },
-      })
-      .then((response) => response.data)
+    const response = await axiosApi.get<PaginatedResult<Equipment>>('/equipment', {
+      params: {
+        page: 1,
+        pageSize: 100,
+        // ...params é um spread operator que pega os parâmetros passados e adiciona ao objeto params.
+        // spread operator é uma forma de copiar propriedades de um objeto para outro.
+        ...params,
+      },
+    })
+
+    return response.data
   },
 
-  summary() {
+  async getEquipmentSummary() {
     // GET /summary devolve os números usados nos cards do topo.
-    return api
-      .get<EquipmentSummaryResponse>('/equipment/summary')
-      .then((response) => response.data)
+    const response = await axiosApi.get<EquipmentSummaryResponse>('/equipment/summary')
+
+    return response.data
   },
 
-  getById(equipmentId: string) {
+  async getEquipmentById(equipmentId: string) {
     // GET com ID busca apenas um equipamento para a tela de detalhes.
-    return api
-      .get<EquipmentDetail>(`/equipment/${equipmentId}`)
-      .then((response) => response.data)
+    const response = await axiosApi.get<EquipmentDetail>(`/equipment/${equipmentId}`)
+
+    return response.data
   },
 
-  create(payload: CreateEquipmentPayload) {
+  async createEquipment(payload: CreateEquipmentPayload) {
     // POST cria um novo registro no backend.
-    return api.post<EquipmentDetail>('/equipment', payload).then((response) => response.data)
+    const response = await axiosApi.post<EquipmentDetail>('/equipment', payload)
+
+    return response.data
   },
 
-  update(equipmentId: string, payload: UpdateEquipmentPayload) {
+  async updateEquipment(equipmentId: string, payload: UpdateEquipmentPayload) {
     // PUT substitui/atualiza os dados principais do equipamento.
-    return api
-      .put<EquipmentDetail>(`/equipment/${equipmentId}`, payload)
-      .then((response) => response.data)
+    const response = await axiosApi.put<EquipmentDetail>(
+      `/equipment/${equipmentId}`,
+      payload,
+    )
+
+    return response.data
   },
 
-  updateStatus(equipmentId: string, payload: UpdateEquipmentStatusPayload) {
+  async updateEquipmentStatus(
+    equipmentId: string,
+    payload: UpdateEquipmentStatusPayload,
+  ) {
     // PATCH altera apenas uma parte do recurso: aqui, o status.
-    return api
-      .patch<EquipmentDetail>(`/equipment/${equipmentId}/status`, payload)
-      .then((response) => response.data)
+    const response = await axiosApi.patch<EquipmentDetail>(
+      `/equipment/${equipmentId}/status`,
+      payload,
+    )
+
+    return response.data
   },
 
-  async listLocationOptions() {
+  async getEquipmentLocationOptions() {
     // Base didática para a aula: usamos localizações apenas para preencher o select.
     // TODO Projeto Final: mover esta lógica para um locationService completo.
-    const response = await api.get<PaginatedResult<ApiLocation>>('/locations', {
+    const response = await axiosApi.get<PaginatedResult<ApiLocation>>('/locations', {
       params: {
         page: 1,
         pageSize: 100,
       },
     })
 
+    // Aqui transformamos a resposta da API para o formato que a tela espera.
     return response.data.data.map<EquipmentLocationOption>((location) => ({
       id: location.id,
       label: `${location.code} - ${location.name}`,

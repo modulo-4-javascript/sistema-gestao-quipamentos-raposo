@@ -60,7 +60,7 @@ Esse arquivo deve ficar bem pequeno:
 ```ts
 import axios from 'axios'
 
-export const api = axios.create({
+export const axiosApi = axios.create({
   baseURL: import.meta.env.VITE_API_URL ?? '/api/v1',
 })
 ```
@@ -75,7 +75,7 @@ O que entender:
 Checkpoint:
 
 ```txt
-api.get('/equipment')
+axiosApi.get('/equipment')
 ```
 
 chama:
@@ -130,69 +130,80 @@ Arquivo:
 frontend/src/features/equipment/services/equipmentService.ts
 ```
 
-O service usa `api`, nao usa `fetch` direto.
+O service usa `axiosApi`, nao usa `fetch` direto.
 
 Listagem:
 
 ```ts
-list(params: ListEquipmentParams = {}) {
-  return api
-    .get<PaginatedResult<Equipment>>('/equipment', {
-      params: {
-        page: 1,
-        pageSize: 100,
-        ...params,
-      },
-    })
-    .then((response) => response.data)
+async getEquipmentList(params: GetEquipmentListParams = {}) {
+  const response = await axiosApi.get<PaginatedResult<Equipment>>('/equipment', {
+    params: {
+      page: 1,
+      pageSize: 100,
+      ...params,
+    },
+  })
+
+  return response.data
 }
 ```
 
 Resumo:
 
 ```ts
-summary() {
-  return api
-    .get<EquipmentSummaryResponse>('/equipment/summary')
-    .then((response) => response.data)
+async getEquipmentSummary() {
+  const response = await axiosApi.get<EquipmentSummaryResponse>('/equipment/summary')
+
+  return response.data
 }
 ```
 
 Detalhe:
 
 ```ts
-getById(equipmentId: string) {
-  return api
-    .get<EquipmentDetail>(`/equipment/${equipmentId}`)
-    .then((response) => response.data)
+async getEquipmentById(equipmentId: string) {
+  const response = await axiosApi.get<EquipmentDetail>(`/equipment/${equipmentId}`)
+
+  return response.data
 }
 ```
 
 Criacao:
 
 ```ts
-create(payload: CreateEquipmentPayload) {
-  return api.post<EquipmentDetail>('/equipment', payload).then((response) => response.data)
+async createEquipment(payload: CreateEquipmentPayload) {
+  const response = await axiosApi.post<EquipmentDetail>('/equipment', payload)
+
+  return response.data
 }
 ```
 
 Edicao:
 
 ```ts
-update(equipmentId: string, payload: UpdateEquipmentPayload) {
-  return api
-    .put<EquipmentDetail>(`/equipment/${equipmentId}`, payload)
-    .then((response) => response.data)
+async updateEquipment(equipmentId: string, payload: UpdateEquipmentPayload) {
+  const response = await axiosApi.put<EquipmentDetail>(
+    `/equipment/${equipmentId}`,
+    payload,
+  )
+
+  return response.data
 }
 ```
 
 Status:
 
 ```ts
-updateStatus(equipmentId: string, payload: UpdateEquipmentStatusPayload) {
-  return api
-    .patch<EquipmentDetail>(`/equipment/${equipmentId}/status`, payload)
-    .then((response) => response.data)
+async updateEquipmentStatus(
+  equipmentId: string,
+  payload: UpdateEquipmentStatusPayload,
+) {
+  const response = await axiosApi.patch<EquipmentDetail>(
+    `/equipment/${equipmentId}/status`,
+    payload,
+  )
+
+  return response.data
 }
 ```
 
@@ -202,7 +213,8 @@ O que entender:
 - `POST` cria;
 - `PUT` edita;
 - `PATCH` altera apenas uma parte;
-- `.then((response) => response.data)` entrega para a tela so o corpo da resposta.
+- `const response = await axiosApi...` espera a API responder;
+- `return response.data` entrega para a tela so o corpo da resposta.
 
 ## Passo 4 - Descomentar os hooks
 
@@ -235,10 +247,10 @@ export function getRequestErrorMessage(error: unknown) {
 Hook da listagem:
 
 ```ts
-export function useEquipmentList(params: ListEquipmentParams) {
+export function useEquipmentList(params: GetEquipmentListParams) {
   const query = useQuery({
-    queryKey: ['equipment', 'list', params],
-    queryFn: () => equipmentService.list(params),
+    queryKey: ['equipment', params],
+    queryFn: () => equipmentService.getEquipmentList(params),
   })
 
   return {
@@ -251,10 +263,10 @@ export function useEquipmentList(params: ListEquipmentParams) {
 Hook de criacao:
 
 ```ts
-export function useCreateEquipmentMutation() {
+export function useCreateEquipment() {
   const queryClient = useQueryClient()
   const mutation = useMutation({
-    mutationFn: (payload: CreateEquipmentPayload) => equipmentService.create(payload),
+    mutationFn: (payload: CreateEquipmentPayload) => equipmentService.createEquipment(payload),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['equipment'] })
     },
@@ -336,14 +348,14 @@ const { equipmentId } = useParams()
 Confira os hooks:
 
 ```ts
-const equipmentQuery = useEquipmentDetail(equipmentId)
+const equipmentQuery = useEquipmentDetails(equipmentId)
 const locationOptionsQuery = useEquipmentLocationOptions()
 ```
 
 O que entender:
 
 - `equipmentId` vem da URL;
-- `useEquipmentDetail` busca um equipamento;
+- `useEquipmentDetails` busca um equipamento;
 - `isLoading` mostra carregamento;
 - `errorMessage` mostra erro simples.
 
@@ -358,8 +370,8 @@ Checkpoint:
 Na pagina de listagem, confira:
 
 ```ts
-const createEquipment = useCreateEquipmentMutation()
-const updateEquipment = useUpdateEquipmentMutation()
+const createEquipment = useCreateEquipment()
+const updateEquipment = useUpdateEquipment()
 ```
 
 Criacao:
@@ -394,7 +406,7 @@ Checkpoint:
 Confira o hook:
 
 ```ts
-const updateEquipmentStatus = useUpdateEquipmentStatusMutation()
+const updateEquipmentStatus = useUpdateEquipmentStatus()
 ```
 
 Confira o envio:
@@ -432,7 +444,7 @@ api.ts -> locationService -> hooks -> pagina -> componentes
 
 Entrega esperada:
 
-- service de localizacoes usando `api.get`, `api.post`, `api.put`, `api.patch`;
+- service de localizacoes usando `axiosApi.get`, `axiosApi.post`, `axiosApi.put`, `axiosApi.patch`;
 - hooks usando `useQuery` e `useMutation`;
 - tratamento simples com `errorMessage`;
 - loading;

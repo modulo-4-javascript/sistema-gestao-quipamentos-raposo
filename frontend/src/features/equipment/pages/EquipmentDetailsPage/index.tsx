@@ -14,10 +14,10 @@ import { EquipmentStatusModal } from '../../components/EquipmentStatusModal'
 import type { EquipmentStatusFormValues } from '../../components/EquipmentStatusModal'
 import {
   getRequestErrorMessage,
-  useEquipmentDetail,
+  useEquipmentDetails,
   useEquipmentLocationOptions,
-  useUpdateEquipmentMutation,
-  useUpdateEquipmentStatusMutation,
+  useUpdateEquipment,
+  useUpdateEquipmentStatus,
 } from '../../hooks/useEquipmentQueries'
 import {
   formatEquipmentDate,
@@ -105,10 +105,10 @@ export function EquipmentDetailsPage() {
   const [equipmentInStatus, setEquipmentInStatus] = useState<EquipmentDetail>()
   const [equipmentToRemove, setEquipmentToRemove] = useState<EquipmentDetail>()
 
-  const equipmentQuery = useEquipmentDetail(equipmentId)
+  const equipmentQuery = useEquipmentDetails(equipmentId)
   const locationOptionsQuery = useEquipmentLocationOptions()
-  const updateEquipment = useUpdateEquipmentMutation()
-  const updateEquipmentStatus = useUpdateEquipmentStatusMutation()
+  const updateEquipment = useUpdateEquipment()
+  const updateEquipmentStatus = useUpdateEquipmentStatus()
 
   const locationOptions = useMemo(
     () => locationOptionsQuery.data ?? [],

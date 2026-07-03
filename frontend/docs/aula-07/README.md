@@ -198,7 +198,7 @@ Arquivo:
 frontend/src/services/api.ts
 ```
 
-Aqui fica a instância `api`, criada com `axios.create`.
+Aqui fica a instância `axiosApi`, criada com `axios.create`.
 
 Ela guarda a URL base para as chamadas do service ficarem curtas e legíveis.
 
@@ -277,7 +277,7 @@ frontend/src/features/equipment/services/equipmentService.ts
 
 Passos:
 
-1. A página chama `equipmentService.list()`;
+1. A página chama `equipmentService.getEquipmentList()`;
 2. o service faz `GET /equipment`;
 3. a API retorna `{ data, meta }`;
 4. a página guarda `data` no estado `equipments`;
@@ -304,7 +304,7 @@ Passos:
 
 1. A rota recebe `equipmentId`;
 2. a página lê o ID com `useParams`;
-3. a página chama `equipmentService.getById(equipmentId)`;
+3. a página chama `equipmentService.getEquipmentById(equipmentId)`;
 4. o service faz `GET /equipment/:equipmentId`;
 5. a tela mostra loading enquanto espera;
 6. se encontrar, renderiza cabeçalho, resumo, informações, observações e histórico;

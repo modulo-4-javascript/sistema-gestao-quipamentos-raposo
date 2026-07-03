@@ -16,12 +16,12 @@ import { PageHeader } from '../../components/PageHeader'
 import { SummaryCards } from '../../components/SummaryCards'
 import {
   getRequestErrorMessage,
-  useCreateEquipmentMutation,
+  useCreateEquipment,
   useEquipmentList,
   useEquipmentLocationOptions,
   useEquipmentSummary,
-  useUpdateEquipmentMutation,
-  useUpdateEquipmentStatusMutation,
+  useUpdateEquipment,
+  useUpdateEquipmentStatus,
 } from '../../hooks/useEquipmentQueries'
 import {
   statusOptions,
@@ -131,9 +131,9 @@ export function EquipmentPage() {
   const equipmentListQuery = useEquipmentList(listParams)
   const equipmentSummaryQuery = useEquipmentSummary()
   const locationOptionsQuery = useEquipmentLocationOptions()
-  const createEquipment = useCreateEquipmentMutation()
-  const updateEquipment = useUpdateEquipmentMutation()
-  const updateEquipmentStatus = useUpdateEquipmentStatusMutation()
+  const createEquipment = useCreateEquipment()
+  const updateEquipment = useUpdateEquipment()
+  const updateEquipmentStatus = useUpdateEquipmentStatus()
 
   const locationOptions = useMemo(
     () => locationOptionsQuery.data ?? [],
