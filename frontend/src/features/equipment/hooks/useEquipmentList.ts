@@ -4,8 +4,8 @@ import {
   type GetEquipmentListParams,
 } from '../services/equipmentService'
 import type { Equipment, PaginatedResult } from '../types/equipment'
-import { getRequestErrorMessage } from './getRequestErrorMessage'
-import type { RequestState } from './requestState'
+import type { RequestState } from '../../../shared/hooks/requestState'
+import { getRequestErrorMessage } from '../../../shared/http/getRequestErrorMessage'
 
 // Hook da listagem: guarda dados, loading e erro, e recarrega quando os filtros mudam.
 export function useEquipmentList(

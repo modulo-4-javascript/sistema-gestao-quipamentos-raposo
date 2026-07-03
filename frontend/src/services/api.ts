@@ -1,8 +1,6 @@
-// AULA 07: descomente este arquivo para criar a instância do Axios usada pelos services.
-// import axios from 'axios'
-//
-// export const axiosApi = axios.create({
-//   baseURL: import.meta.env.VITE_API_URL ?? '/api/v1',
-// })
+import axios from 'axios'
 
-export {}
+// Instância do Axios com a URL base da API para não repetir /api/v1 nos services.
+export const axiosApi = axios.create({
+  baseURL: import.meta.env.VITE_API_URL ?? '/api/v1',
+})

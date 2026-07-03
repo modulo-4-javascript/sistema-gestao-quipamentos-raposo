@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { equipmentService } from '../services/equipmentService'
 import type { EquipmentDetail } from '../types/equipment'
-import { getRequestErrorMessage } from './getRequestErrorMessage'
-import type { RequestState } from './requestState'
+import type { RequestState } from '../../../shared/hooks/requestState'
+import { getRequestErrorMessage } from '../../../shared/http/getRequestErrorMessage'
 
 // Hook do detalhe: recebe o ID da rota e busca um único equipamento.
 export function useEquipmentDetails(equipmentId?: string): RequestState<EquipmentDetail> {

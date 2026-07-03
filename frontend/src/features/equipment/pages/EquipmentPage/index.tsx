@@ -14,7 +14,7 @@ import type { EquipmentStatusFormValues } from '../../components/EquipmentStatus
 import { EquipmentTable } from '../../components/EquipmentTable'
 import { PageHeader } from '../../components/PageHeader'
 import { SummaryCards } from '../../components/SummaryCards'
-import { getRequestErrorMessage } from '../../hooks/getRequestErrorMessage'
+import { getRequestErrorMessage } from '../../../../shared/http/getRequestErrorMessage'
 import { useCreateEquipment } from '../../hooks/useCreateEquipment'
 import { useEquipmentList } from '../../hooks/useEquipmentList'
 import { useEquipmentLocationOptions } from '../../hooks/useEquipmentLocationOptions'

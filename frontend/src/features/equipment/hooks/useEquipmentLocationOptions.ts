@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { equipmentService } from '../services/equipmentService'
 import type { EquipmentLocationOption } from '../types/equipment'
-import { getRequestErrorMessage } from './getRequestErrorMessage'
-import type { RequestState } from './requestState'
+import type { RequestState } from '../../../shared/hooks/requestState'
+import { getRequestErrorMessage } from '../../../shared/http/getRequestErrorMessage'
 
 // Hook das localizações: transforma a rota de locais em opções para os selects.
 export function useEquipmentLocationOptions(): RequestState<EquipmentLocationOption[]> {

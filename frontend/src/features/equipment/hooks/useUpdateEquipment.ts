@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { equipmentService } from '../services/equipmentService'
 import type { EquipmentDetail, UpdateEquipmentPayload } from '../types/equipment'
-import { getRequestErrorMessage } from './getRequestErrorMessage'
+import { getRequestErrorMessage } from '../../../shared/http/getRequestErrorMessage'
 
 interface UpdateEquipmentState {
   isLoading: boolean

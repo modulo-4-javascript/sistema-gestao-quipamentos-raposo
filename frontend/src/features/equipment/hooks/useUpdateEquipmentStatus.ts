@@ -4,7 +4,7 @@ import type {
   EquipmentDetail,
   UpdateEquipmentStatusPayload,
 } from '../types/equipment'
-import { getRequestErrorMessage } from './getRequestErrorMessage'
+import { getRequestErrorMessage } from '../../../shared/http/getRequestErrorMessage'
 
 interface UpdateEquipmentStatusState {
   isLoading: boolean
