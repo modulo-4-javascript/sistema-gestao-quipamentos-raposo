@@ -17,9 +17,12 @@ import {
 } from '../../mocks/equipment.mock'
 import type { Equipment, EquipmentStatus, EquipmentType } from '../../types/equipment'
 import { Container } from './styles'
+import { useNavigate } from 'react-router-dom'
+
 
 export function EquipmentPage() {
   const [messageApi, contextHolder] = message.useMessage()
+  const navigate = useNavigate()
 
   // Estados dos filtros. Cada campo da área de filtros controla um estado aqui.
   const [searchText, setSearchText] = useState('')
@@ -30,6 +33,10 @@ export function EquipmentPage() {
   const [equipmentInForm, setEquipmentInForm] = useState<Equipment>()
   const [equipmentInStatus, setEquipmentInStatus] = useState<Equipment>()
   const [equipmentToRemove, setEquipmentToRemove] = useState<Equipment>()
+
+  function handleViewEquipment(equipment: Equipment) {
+    navigate(`/equipment/${equipment.id}`)
+  }
 
   function handleCreateEquipment() {
     setFormMode('create')
@@ -107,6 +114,7 @@ export function EquipmentPage() {
         <EquipmentTable
           equipments={visibleEquipment}
           onChangeStatusEquipment={setEquipmentInStatus}
+          onViewEquipment={handleViewEquipment}
           onEditEquipment={handleEditEquipment}
           onRemoveEquipment={setEquipmentToRemove}
         />
