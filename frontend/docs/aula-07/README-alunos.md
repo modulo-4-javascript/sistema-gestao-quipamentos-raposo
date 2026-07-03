@@ -12,7 +12,11 @@ A ideia e descomentar/conferir as partes em ordem:
 api.ts -> equipmentService -> hooks -> pagina -> componentes
 ```
 
-Se algum trecho ja estiver ativo no seu projeto, use o passo como conferencia.
+O projeto começa sem chamadas ativas para a API nesta camada.
+
+Os trechos que falam diretamente com a API começam comentados em `api.ts` e no final de `equipmentService.ts`. Antes de cada bloco comentado existe uma explicação curta dizendo o que ele faz.
+
+Hooks, páginas e componentes ficam ativos para a turma conferir o fluxo depois que o service real for descomentado.
 
 ## Mapa visual da integração
 
@@ -133,6 +137,8 @@ export const axiosApi = axios.create({
 })
 ```
 
+No arquivo, remova os `//` dessas linhas e apague o `export {}` temporário.
+
 O que entender:
 
 - `axios.create` cria uma instancia pronta para chamar a API;
@@ -184,7 +190,16 @@ Arquivo:
 frontend/src/features/equipment/services/equipmentService.ts
 ```
 
-O service usa `axiosApi`, nao usa `fetch` direto.
+O arquivo começa com um placeholder vazio apenas para o TypeScript compilar antes da integração.
+
+Para integrar:
+
+- descomente o import de `axiosApi`;
+- descomente o tipo auxiliar `ApiLocation`;
+- comente ou remova o placeholder `export const equipmentService = {} as EquipmentService`;
+- descomente o bloco final com o service real.
+
+O service real usa `axiosApi`, nao usa `fetch` direto.
 
 Listagem:
 
@@ -271,7 +286,7 @@ O que entender:
 - `const response = await axiosApi...` espera a API responder;
 - `return response.data` entrega para a tela so o corpo da resposta.
 
-## Passo 4 - Descomentar os hooks
+## Passo 4 - Conferir os hooks
 
 Arquivo:
 
@@ -383,7 +398,7 @@ O que entender:
 - `reload` permite buscar novamente depois de salvar;
 - cada hook devolve uma função simples para a página usar.
 
-## Passo 5 - Descomentar a listagem na pagina
+## Passo 5 - Conferir a listagem na pagina
 
 Arquivo:
 
@@ -509,7 +524,7 @@ Checkpoint:
 - filtros disparam nova busca;
 - se a API falhar, aparece mensagem simples.
 
-## Passo 6 - Descomentar detalhe
+## Passo 6 - Conferir detalhe
 
 Arquivo:
 
@@ -543,7 +558,7 @@ Checkpoint:
 - troque o ID da URL para um valor invalido;
 - confira a tela de erro.
 
-## Passo 7 - Descomentar criacao e edicao
+## Passo 7 - Conferir criacao e edicao
 
 Na pagina de listagem, confira:
 
@@ -579,7 +594,7 @@ Checkpoint:
 - edite o nome ou responsavel;
 - confira a tabela atualizada.
 
-## Passo 8 - Descomentar alteracao de status
+## Passo 8 - Conferir alteracao de status
 
 Confira o hook:
 

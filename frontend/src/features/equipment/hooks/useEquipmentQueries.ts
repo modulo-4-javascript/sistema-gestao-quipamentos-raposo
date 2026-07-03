@@ -66,6 +66,7 @@ export function getRequestErrorMessage(error: unknown) {
   return 'Não foi possível completar a comunicação com a API.'
 }
 
+// Hook da listagem: guarda dados, loading e erro, e recarrega quando os filtros mudam.
 export function useEquipmentList(
   params: GetEquipmentListParams,
 ): RequestState<PaginatedResult<Equipment>> {
@@ -74,6 +75,7 @@ export function useEquipmentList(
   const [isLoading, setIsLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState('')
 
+  // Função que chama o service e atualiza o estado usado pela tabela.
   const loadEquipmentList = useCallback(async () => {
     setIsLoading(true)
     setErrorMessage('')
@@ -107,11 +109,13 @@ export function useEquipmentList(
   }
 }
 
+// Hook do resumo: busca os números usados nos cards do topo.
 export function useEquipmentSummary(): RequestState<EquipmentSummaryResponse> {
   const [data, setData] = useState<EquipmentSummaryResponse>()
   const [isLoading, setIsLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState('')
 
+  // Função que chama o endpoint de resumo e guarda a resposta em data.
   const loadEquipmentSummary = useCallback(async () => {
     setIsLoading(true)
     setErrorMessage('')
@@ -139,11 +143,13 @@ export function useEquipmentSummary(): RequestState<EquipmentSummaryResponse> {
   }
 }
 
+// Hook do detalhe: recebe o ID da rota e busca um único equipamento.
 export function useEquipmentDetails(equipmentId?: string): RequestState<EquipmentDetail> {
   const [data, setData] = useState<EquipmentDetail>()
   const [isLoading, setIsLoading] = useState(Boolean(equipmentId))
   const [errorMessage, setErrorMessage] = useState('')
 
+  // Se não houver ID, não existe o que buscar; se houver, chamamos o service.
   const loadEquipmentDetails = useCallback(async () => {
     if (!equipmentId) {
       setIsLoading(false)
@@ -176,11 +182,13 @@ export function useEquipmentDetails(equipmentId?: string): RequestState<Equipmen
   }
 }
 
+// Hook das localizações: transforma a rota de locais em opções para os selects.
 export function useEquipmentLocationOptions(): RequestState<EquipmentLocationOption[]> {
   const [data, setData] = useState<EquipmentLocationOption[]>()
   const [isLoading, setIsLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState('')
 
+  // Busca as localizações já formatadas pelo service para uso no formulário.
   const loadEquipmentLocationOptions = useCallback(async () => {
     setIsLoading(true)
     setErrorMessage('')
@@ -208,10 +216,12 @@ export function useEquipmentLocationOptions(): RequestState<EquipmentLocationOpt
   }
 }
 
+// Hook de criação: expõe uma função create e controla loading/erro do botão de salvar.
 export function useCreateEquipment(): CreateEquipmentState {
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
 
+  // Envia o payload para o backend; quem chama decide quando recarregar a tela.
   async function create(payload: CreateEquipmentPayload) {
     setIsLoading(true)
     setErrorMessage('')
@@ -233,10 +243,12 @@ export function useCreateEquipment(): CreateEquipmentState {
   }
 }
 
+// Hook de edição: expõe uma função update para atualizar um equipamento existente.
 export function useUpdateEquipment(): UpdateEquipmentState {
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
 
+  // Recebe o ID e os dados editados, chama o service e devolve a resposta da API.
   async function update({ equipmentId, payload }: UpdateEquipmentActionPayload) {
     setIsLoading(true)
     setErrorMessage('')
@@ -258,10 +270,12 @@ export function useUpdateEquipment(): UpdateEquipmentState {
   }
 }
 
+// Hook de status: expõe uma função updateStatus para alterar só o status do equipamento.
 export function useUpdateEquipmentStatus(): UpdateEquipmentStatusState {
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
 
+  // Recebe o ID e o novo status, chama o PATCH do service e controla loading/erro.
   async function updateStatus({
     equipmentId,
     payload,

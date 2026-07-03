@@ -168,6 +168,13 @@ Até agora, a tela usava mocks: dados escritos dentro do próprio frontend.
 
 Na integração com API, o frontend deixa de inventar os dados e passa a pedir informações ao backend.
 
+Ponto de partida da branch:
+
+- `api.ts` começa com a instância do Axios comentada;
+- `equipmentService.ts` começa com um placeholder vazio para compilar;
+- o bloco real do service com Axios fica comentado no final do arquivo;
+- hooks, páginas e componentes ficam ativos para a turma conferir o fluxo.
+
 Exemplo:
 
 ```txt
@@ -330,6 +337,8 @@ O service centraliza as chamadas para a API.
 
 Assim, a tela não precisa saber todos os detalhes de URL, método HTTP e tratamento básico de erro.
 
+Na aula, primeiro existe um placeholder vazio. Depois os alunos comentam/removem esse placeholder e descomentam o service real com `axiosApi`.
+
 ### API base
 
 Arquivo:
@@ -341,6 +350,8 @@ frontend/src/services/api.ts
 Aqui fica a instância `axiosApi`, criada com `axios.create`.
 
 Ela guarda a URL base para as chamadas do service ficarem curtas e legíveis.
+
+No ponto de partida, esse conteúdo está comentado para ser descomentado junto com a turma.
 
 ### Hooks
 

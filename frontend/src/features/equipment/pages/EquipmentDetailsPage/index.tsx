@@ -38,6 +38,7 @@ import {
   StarterBox,
 } from './styles'
 
+// Antes de enviar para a API, limpamos espaços e transformamos campos vazios em undefined/null.
 function buildEquipmentPayload(values: EquipmentFormValues): CreateEquipmentPayload {
   return {
     name: values.name.trim(),
@@ -51,6 +52,7 @@ function buildEquipmentPayload(values: EquipmentFormValues): CreateEquipmentPayl
   }
 }
 
+// A API devolve os dados completos; esta função escolhe o que vira card de resumo.
 function buildDetailSummary(equipment: EquipmentDetail): EquipmentDetailSummary[] {
   return [
     {
@@ -80,6 +82,7 @@ function buildDetailSummary(equipment: EquipmentDetail): EquipmentDetailSummary[
   ]
 }
 
+// O detalhe vem com locationId. Aqui adicionamos o nome da localização para a tela.
 function withLocationName(
   equipment: EquipmentDetail,
   locationOptions: EquipmentLocationOption[],
@@ -99,21 +102,28 @@ function withLocationName(
 export function EquipmentDetailsPage() {
   const { message: messageApi } = AntDesignApp.useApp()
   const navigate = useNavigate()
+
+  // O ID vem da URL /equipment/:equipmentId e decide qual equipamento buscar.
   const { equipmentId } = useParams()
 
+  // Estes estados controlam apenas os modais da página de detalhes.
   const [equipmentInForm, setEquipmentInForm] = useState<EquipmentDetail>()
   const [equipmentInStatus, setEquipmentInStatus] = useState<EquipmentDetail>()
   const [equipmentToRemove, setEquipmentToRemove] = useState<EquipmentDetail>()
 
+  // Hooks que usam useEffect + axios para buscar e salvar dados na API.
   const equipmentQuery = useEquipmentDetails(equipmentId)
   const locationOptionsQuery = useEquipmentLocationOptions()
   const updateEquipment = useUpdateEquipment()
   const updateEquipmentStatus = useUpdateEquipmentStatus()
 
+  // Garante que a tela sempre tenha uma lista de localizações, mesmo antes da API responder.
   const locationOptions = useMemo(
     () => locationOptionsQuery.data ?? [],
     [locationOptionsQuery.data],
   )
+
+  // Junta os dados do equipamento com o nome da localização antes de renderizar.
   const equipment = useMemo(
     () =>
       equipmentQuery.data
@@ -121,6 +131,8 @@ export function EquipmentDetailsPage() {
         : undefined,
     [equipmentQuery.data, locationOptions],
   )
+
+  // Loading e erro combinam as duas buscas necessárias para montar o detalhe.
   const isLoading = equipmentQuery.isLoading || locationOptionsQuery.isLoading
   const loadError =
     (!equipmentId ? 'ID do equipamento não encontrado na rota.' : '') ||
@@ -129,23 +141,27 @@ export function EquipmentDetailsPage() {
   const isSavingForm = updateEquipment.isLoading
   const isSavingStatus = updateEquipmentStatus.isLoading
 
+  // Cards de resumo são derivados do equipamento carregado.
   const summaries = useMemo(
     () => (equipment ? buildDetailSummary(equipment) : []),
     [equipment],
   )
 
+  // Abre o modal de edição usando o equipamento já carregado.
   function handleEditEquipment() {
     if (equipment) {
       setEquipmentInForm(equipment)
     }
   }
 
+  // Abre o modal de alteração de status usando o equipamento já carregado.
   function handleChangeStatus() {
     if (equipment) {
       setEquipmentInStatus(equipment)
     }
   }
 
+  // Salva a edição e depois recarrega o detalhe para mostrar os dados atualizados.
   async function handleSubmitFormModal(values: EquipmentFormValues) {
     if (!equipmentInForm) {
       return
@@ -164,6 +180,7 @@ export function EquipmentDetailsPage() {
     }
   }
 
+  // Salva o novo status e depois recarrega o detalhe para atualizar cards e histórico.
   async function handleSubmitStatusModal(values: EquipmentStatusFormValues) {
     if (!equipmentInStatus) {
       return
@@ -191,6 +208,7 @@ export function EquipmentDetailsPage() {
     setEquipmentToRemove(undefined)
   }
 
+  // Enquanto o detalhe ou as localizações carregam, mostramos um estado simples de espera.
   if (isLoading) {
     return (
       <AppLayout currentPage="Detalhes">
@@ -203,6 +221,7 @@ export function EquipmentDetailsPage() {
     )
   }
 
+  // Se a API falhar ou o equipamento não existir, mostramos uma mensagem de erro didática.
   if (loadError || !equipment) {
     return (
       <AppLayout currentPage="Detalhes">
@@ -221,6 +240,7 @@ export function EquipmentDetailsPage() {
   return (
     <AppLayout currentPage="Detalhes">
       <Container>
+        {/* Cabeçalho com ações principais: voltar, editar, status e excluir. */}
         <DetailsHeader
           equipment={equipment}
           onBack={() => navigate('/equipment')}
@@ -229,8 +249,10 @@ export function EquipmentDetailsPage() {
           onRemove={() => setEquipmentToRemove(equipment)}
         />
 
+        {/* Cards calculados a partir do equipamento carregado pela API. */}
         <DetailSummaryCards summaries={summaries} />
 
+        {/* Conteúdo principal: informações gerais, observações e histórico recente. */}
         <ContentGrid>
           <MainColumn>
             <EquipmentInfoCard equipment={equipment} />
@@ -242,6 +264,7 @@ export function EquipmentDetailsPage() {
           </SideColumn>
         </ContentGrid>
 
+        {/* Modal de edição do equipamento atual. */}
         <EquipmentFormModal
           confirmLoading={isSavingForm}
           equipment={equipmentInForm}
@@ -254,6 +277,7 @@ export function EquipmentDetailsPage() {
           onSubmit={handleSubmitFormModal}
         />
 
+        {/* Modal específico para mudança rápida de status. */}
         <EquipmentStatusModal
           confirmLoading={isSavingStatus}
           equipment={equipmentInStatus}
@@ -263,6 +287,7 @@ export function EquipmentDetailsPage() {
           onSubmit={handleSubmitStatusModal}
         />
 
+        {/* Exclusão ainda é visual nesta aula; o DELETE fica como evolução. */}
         <EquipmentRemoveModal
           equipment={equipmentToRemove}
           open={Boolean(equipmentToRemove)}
