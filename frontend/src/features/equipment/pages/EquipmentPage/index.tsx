@@ -1,5 +1,5 @@
 import { Alert, App as AntDesignApp, Empty } from 'antd'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AppLayout } from '../../../../app/layout/AppLayout'
 import { EquipmentFilters } from '../../components/EquipmentFilters'
@@ -14,18 +14,24 @@ import type { EquipmentStatusFormValues } from '../../components/EquipmentStatus
 import { EquipmentTable } from '../../components/EquipmentTable'
 import { PageHeader } from '../../components/PageHeader'
 import { SummaryCards } from '../../components/SummaryCards'
-import { equipmentService } from '../../services/equipmentService'
+import {
+  getRequestErrorMessage,
+  useCreateEquipmentMutation,
+  useEquipmentList,
+  useEquipmentLocationOptions,
+  useEquipmentSummary,
+  useUpdateEquipmentMutation,
+  useUpdateEquipmentStatusMutation,
+} from '../../hooks/useEquipmentQueries'
 import {
   statusOptions,
   typeOptions,
   type CreateEquipmentPayload,
   type Equipment,
-  type EquipmentLocationOption,
-  type EquipmentStatus,
   type EquipmentSummary,
   type EquipmentSummaryResponse,
   type EquipmentType,
-  type UpdateEquipmentPayload,
+  type EquipmentStatus,
 } from '../../types/equipment'
 import { Container } from './styles'
 
@@ -34,12 +40,6 @@ const emptySummary: EquipmentSummaryResponse = {
   available: 0,
   inMaintenance: 0,
   inactive: 0,
-}
-
-function getErrorMessage(error: unknown) {
-  return error instanceof Error
-    ? error.message
-    : 'Não foi possível carregar os equipamentos.'
 }
 
 function buildSummaryCards(summary: EquipmentSummaryResponse): EquipmentSummary[] {
@@ -106,8 +106,9 @@ function buildEquipmentPayload(values: EquipmentFormValues): CreateEquipmentPayl
 
 export function EquipmentPage() {
   const { message: messageApi } = AntDesignApp.useApp()
+  const navigate = useNavigate()
 
-  // Estados dos filtros. Cada campo da área de filtros controla um estado aqui.
+  // Estados visuais continuam na página. Dados de API ficam nos hooks.
   const [searchText, setSearchText] = useState('')
   const [selectedStatus, setSelectedStatus] = useState<EquipmentStatus>()
   const [selectedType, setSelectedType] = useState<EquipmentType>()
@@ -117,15 +118,42 @@ export function EquipmentPage() {
   const [equipmentInStatus, setEquipmentInStatus] = useState<Equipment>()
   const [equipmentToRemove, setEquipmentToRemove] = useState<Equipment>()
 
-  const [equipments, setEquipments] = useState<Equipment[]>([])
-  const [summary, setSummary] = useState<EquipmentSummaryResponse>(emptySummary)
-  const [locationOptions, setLocationOptions] = useState<EquipmentLocationOption[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [loadError, setLoadError] = useState('')
-  const [isSavingForm, setIsSavingForm] = useState(false)
-  const [isSavingStatus, setIsSavingStatus] = useState(false)
+  const listParams = useMemo(
+    () => ({
+      // TODO Aula 07: evoluir este ponto para debounce, paginação ou busca ao pressionar Enter.
+      search: searchText,
+      status: selectedStatus,
+      type: selectedType,
+    }),
+    [searchText, selectedStatus, selectedType],
+  )
 
-  const navigate = useNavigate()
+  const equipmentListQuery = useEquipmentList(listParams)
+  const equipmentSummaryQuery = useEquipmentSummary()
+  const locationOptionsQuery = useEquipmentLocationOptions()
+  const createEquipment = useCreateEquipmentMutation()
+  const updateEquipment = useUpdateEquipmentMutation()
+  const updateEquipmentStatus = useUpdateEquipmentStatusMutation()
+
+  const locationOptions = useMemo(
+    () => locationOptionsQuery.data ?? [],
+    [locationOptionsQuery.data],
+  )
+  const equipments = useMemo(
+    () => equipmentListQuery.data?.data ?? [],
+    [equipmentListQuery.data],
+  )
+  const summary = equipmentSummaryQuery.data ?? emptySummary
+  const isLoading =
+    equipmentListQuery.isLoading ||
+    equipmentSummaryQuery.isLoading ||
+    locationOptionsQuery.isLoading
+  const loadError =
+    equipmentListQuery.errorMessage ||
+    equipmentSummaryQuery.errorMessage ||
+    locationOptionsQuery.errorMessage
+  const isSavingForm = createEquipment.isPending || updateEquipment.isPending
+  const isSavingStatus = updateEquipmentStatus.isPending
 
   const locationLabelById = useMemo(
     () => new Map(locationOptions.map((location) => [location.id, location.label])),
@@ -138,36 +166,6 @@ export function EquipmentPage() {
   )
 
   const summaryCards = useMemo(() => buildSummaryCards(summary), [summary])
-
-  const loadEquipment = useCallback(async () => {
-    setIsLoading(true)
-    setLoadError('')
-
-    try {
-      const [equipmentResponse, summaryResponse, locationResponse] = await Promise.all([
-        equipmentService.list({
-          // TODO Aula 07: evoluir este ponto para debounce, paginação ou busca ao pressionar Enter.
-          search: searchText,
-          status: selectedStatus,
-          type: selectedType,
-        }),
-        equipmentService.summary(),
-        equipmentService.listLocationOptions(),
-      ])
-
-      setEquipments(equipmentResponse.data)
-      setSummary(summaryResponse)
-      setLocationOptions(locationResponse)
-    } catch (error) {
-      setLoadError(getErrorMessage(error))
-    } finally {
-      setIsLoading(false)
-    }
-  }, [searchText, selectedStatus, selectedType])
-
-  useEffect(() => {
-    void Promise.resolve().then(loadEquipment)
-  }, [loadEquipment])
 
   function handleViewEquipment(equipment: Equipment) {
     navigate(`/equipment/${equipment.id}`)
@@ -193,23 +191,21 @@ export function EquipmentPage() {
   async function handleSubmitFormModal(values: EquipmentFormValues) {
     const payload = buildEquipmentPayload(values)
 
-    setIsSavingForm(true)
-
     try {
       if (formMode === 'edit' && equipmentInForm) {
-        await equipmentService.update(equipmentInForm.id, payload as UpdateEquipmentPayload)
+        await updateEquipment.mutateAsync({
+          equipmentId: equipmentInForm.id,
+          payload,
+        })
         messageApi.success('Equipamento atualizado com sucesso.')
       } else {
-        await equipmentService.create(payload)
+        await createEquipment.mutateAsync(payload)
         messageApi.success('Equipamento cadastrado com sucesso.')
       }
 
       handleCloseFormModal()
-      await loadEquipment()
     } catch (error) {
-      messageApi.error(getErrorMessage(error))
-    } finally {
-      setIsSavingForm(false)
+      messageApi.error(getRequestErrorMessage(error))
     }
   }
 
@@ -224,26 +220,23 @@ export function EquipmentPage() {
       return
     }
 
-    setIsSavingStatus(true)
-
     try {
-      await equipmentService.updateStatus(equipmentInStatus.id, {
-        status: values.status,
-        note: values.note?.trim() || null,
+      await updateEquipmentStatus.mutateAsync({
+        equipmentId: equipmentInStatus.id,
+        payload: {
+          status: values.status,
+          note: values.note?.trim() || null,
+        },
       })
 
       messageApi.success('Status atualizado com sucesso.')
       setEquipmentInStatus(undefined)
-      await loadEquipment()
     } catch (error) {
-      messageApi.error(getErrorMessage(error))
-    } finally {
-      setIsSavingStatus(false)
+      messageApi.error(getRequestErrorMessage(error))
     }
   }
 
   function handleClearFilters() {
-    // Limpa todos os filtros e volta a tabela para o estado inicial.
     setSearchText('')
     setSelectedStatus(undefined)
     setSelectedType(undefined)
@@ -252,13 +245,10 @@ export function EquipmentPage() {
   return (
     <AppLayout currentPage="Equipamentos">
       <Container>
-        {/* Cabeçalho da feature: título, descrição e botão principal. */}
         <PageHeader onCreateEquipment={handleCreateEquipment} />
 
-        {/* Cards de resumo: agora os números vêm do endpoint GET /equipment/summary. */}
         <SummaryCards summaries={summaryCards} />
 
-        {/* Filtros controlados: os valores viram query params no service. */}
         <EquipmentFilters
           searchText={searchText}
           selectedStatus={selectedStatus}

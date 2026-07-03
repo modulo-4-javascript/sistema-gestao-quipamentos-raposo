@@ -4,6 +4,7 @@ import net from 'node:net'
 import { dirname, resolve } from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
+import axios from 'axios'
 
 const scriptDir = dirname(fileURLToPath(import.meta.url))
 const frontendDir = resolve(scriptDir, '..')
@@ -312,9 +313,9 @@ async function waitForPostgres(compose, env) {
 async function waitForApi(port) {
   for (let attempt = 1; attempt <= 40; attempt += 1) {
     try {
-      const response = await fetch(`http://localhost:${port}/health`)
+      const response = await axios.get(`http://localhost:${port}/health`)
 
-      if (response.ok) {
+      if (response.status >= 200 && response.status < 300) {
         return
       }
     } catch {
@@ -457,9 +458,9 @@ async function prepareBackend() {
 
 async function fetchHealth(port) {
   try {
-    const response = await fetch(`http://localhost:${port}/health`)
+    const response = await axios.get(`http://localhost:${port}/health`)
 
-    return response.ok
+    return response.status >= 200 && response.status < 300
   } catch {
     return false
   }

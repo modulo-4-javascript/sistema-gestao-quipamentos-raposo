@@ -1,5 +1,5 @@
 import { Alert, App as AntDesignApp, Spin } from 'antd'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { AppLayout } from '../../../../app/layout/AppLayout'
 import { DetailSummaryCards } from '../../components/DetailSummaryCards'
@@ -12,7 +12,13 @@ import { EquipmentNotesCard } from '../../components/EquipmentNotesCard'
 import { EquipmentRemoveModal } from '../../components/EquipmentRemoveModal'
 import { EquipmentStatusModal } from '../../components/EquipmentStatusModal'
 import type { EquipmentStatusFormValues } from '../../components/EquipmentStatusModal'
-import { equipmentService } from '../../services/equipmentService'
+import {
+  getRequestErrorMessage,
+  useEquipmentDetail,
+  useEquipmentLocationOptions,
+  useUpdateEquipmentMutation,
+  useUpdateEquipmentStatusMutation,
+} from '../../hooks/useEquipmentQueries'
 import {
   formatEquipmentDate,
   getEquipmentStatusLabel,
@@ -22,7 +28,6 @@ import {
   type EquipmentDetail,
   type EquipmentDetailSummary,
   type EquipmentLocationOption,
-  type UpdateEquipmentPayload,
 } from '../../types/equipment'
 
 import {
@@ -32,12 +37,6 @@ import {
   SideColumn,
   StarterBox,
 } from './styles'
-
-function getErrorMessage(error: unknown) {
-  return error instanceof Error
-    ? error.message
-    : 'Não foi possível carregar o equipamento.'
-}
 
 function buildEquipmentPayload(values: EquipmentFormValues): CreateEquipmentPayload {
   return {
@@ -102,44 +101,33 @@ export function EquipmentDetailsPage() {
   const navigate = useNavigate()
   const { equipmentId } = useParams()
 
-  const [equipment, setEquipment] = useState<EquipmentDetail>()
-  const [locationOptions, setLocationOptions] = useState<EquipmentLocationOption[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [loadError, setLoadError] = useState('')
   const [equipmentInForm, setEquipmentInForm] = useState<EquipmentDetail>()
   const [equipmentInStatus, setEquipmentInStatus] = useState<EquipmentDetail>()
   const [equipmentToRemove, setEquipmentToRemove] = useState<EquipmentDetail>()
-  const [isSavingForm, setIsSavingForm] = useState(false)
-  const [isSavingStatus, setIsSavingStatus] = useState(false)
 
-  const loadEquipmentDetail = useCallback(async () => {
-    if (!equipmentId) {
-      setLoadError('ID do equipamento não encontrado na rota.')
-      setIsLoading(false)
-      return
-    }
+  const equipmentQuery = useEquipmentDetail(equipmentId)
+  const locationOptionsQuery = useEquipmentLocationOptions()
+  const updateEquipment = useUpdateEquipmentMutation()
+  const updateEquipmentStatus = useUpdateEquipmentStatusMutation()
 
-    setIsLoading(true)
-    setLoadError('')
-
-    try {
-      const [equipmentResponse, locationResponse] = await Promise.all([
-        equipmentService.getById(equipmentId),
-        equipmentService.listLocationOptions(),
-      ])
-
-      setLocationOptions(locationResponse)
-      setEquipment(withLocationName(equipmentResponse, locationResponse))
-    } catch (error) {
-      setLoadError(getErrorMessage(error))
-    } finally {
-      setIsLoading(false)
-    }
-  }, [equipmentId])
-
-  useEffect(() => {
-    void Promise.resolve().then(loadEquipmentDetail)
-  }, [loadEquipmentDetail])
+  const locationOptions = useMemo(
+    () => locationOptionsQuery.data ?? [],
+    [locationOptionsQuery.data],
+  )
+  const equipment = useMemo(
+    () =>
+      equipmentQuery.data
+        ? withLocationName(equipmentQuery.data, locationOptions)
+        : undefined,
+    [equipmentQuery.data, locationOptions],
+  )
+  const isLoading = equipmentQuery.isLoading || locationOptionsQuery.isLoading
+  const loadError =
+    (!equipmentId ? 'ID do equipamento não encontrado na rota.' : '') ||
+    equipmentQuery.errorMessage ||
+    locationOptionsQuery.errorMessage
+  const isSavingForm = updateEquipment.isPending
+  const isSavingStatus = updateEquipmentStatus.isPending
 
   const summaries = useMemo(
     () => (equipment ? buildDetailSummary(equipment) : []),
@@ -163,20 +151,15 @@ export function EquipmentDetailsPage() {
       return
     }
 
-    setIsSavingForm(true)
-
     try {
-      await equipmentService.update(
-        equipmentInForm.id,
-        buildEquipmentPayload(values) as UpdateEquipmentPayload,
-      )
+      await updateEquipment.mutateAsync({
+        equipmentId: equipmentInForm.id,
+        payload: buildEquipmentPayload(values),
+      })
       messageApi.success('Equipamento atualizado com sucesso.')
       setEquipmentInForm(undefined)
-      await loadEquipmentDetail()
     } catch (error) {
-      messageApi.error(getErrorMessage(error))
-    } finally {
-      setIsSavingForm(false)
+      messageApi.error(getRequestErrorMessage(error))
     }
   }
 
@@ -185,20 +168,18 @@ export function EquipmentDetailsPage() {
       return
     }
 
-    setIsSavingStatus(true)
-
     try {
-      await equipmentService.updateStatus(equipmentInStatus.id, {
-        status: values.status,
-        note: values.note?.trim() || null,
+      await updateEquipmentStatus.mutateAsync({
+        equipmentId: equipmentInStatus.id,
+        payload: {
+          status: values.status,
+          note: values.note?.trim() || null,
+        },
       })
       messageApi.success('Status atualizado com sucesso.')
       setEquipmentInStatus(undefined)
-      await loadEquipmentDetail()
     } catch (error) {
-      messageApi.error(getErrorMessage(error))
-    } finally {
-      setIsSavingStatus(false)
+      messageApi.error(getRequestErrorMessage(error))
     }
   }
 

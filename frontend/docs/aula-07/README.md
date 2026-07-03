@@ -174,7 +174,7 @@ Exemplo:
 GET /api/v1/equipment
 ```
 
-Esse `GET` pede a lista de equipamentos. A API responde com JSON. O frontend guarda esse JSON no estado e renderiza a tabela.
+Esse `GET` pede a lista de equipamentos. A API responde com JSON. O TanStack Query guarda essa resposta e a tela renderiza a tabela.
 
 ## Camadas usadas na integração
 
@@ -188,7 +188,7 @@ frontend/src/features/equipment/services/equipmentService.ts
 
 O service centraliza as chamadas para a API.
 
-Assim, a tela não precisa saber todos os detalhes de `fetch`, URL, método HTTP e tratamento básico de erro.
+Assim, a tela não precisa saber todos os detalhes de URL, método HTTP e tratamento básico de erro.
 
 ### API base
 
@@ -198,9 +198,21 @@ Arquivo:
 frontend/src/services/api.ts
 ```
 
-Aqui fica a função `apiRequest`, que chama o backend usando `fetch`.
+Aqui fica a instância `api`, criada com `axios.create`.
 
-Ela monta a URL base, envia JSON quando necessário e transforma respostas de erro em uma mensagem simples para a tela.
+Ela guarda a URL base para as chamadas do service ficarem curtas e legíveis.
+
+### Hooks
+
+Arquivo:
+
+```txt
+frontend/src/features/equipment/hooks/useEquipmentQueries.ts
+```
+
+Aqui ficam os `useQuery` e `useMutation`.
+
+Eles controlam loading, erro, cache e atualização da tela depois de criar, editar ou alterar status.
 
 ### Types
 
