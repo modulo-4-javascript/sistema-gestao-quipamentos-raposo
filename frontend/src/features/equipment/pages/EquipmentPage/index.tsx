@@ -131,13 +131,18 @@ export function EquipmentPage() {
   const [equipmentInStatus, setEquipmentInStatus] = useState<Equipment>()
   const [equipmentToRemove, setEquipmentToRemove] = useState<Equipment>()
 
-  // Debounce simples: a API só recebe a busca depois que o usuário para de digitar.
+  // Debounce da busca:
+  // 1. searchText muda a cada tecla digitada.
+  // 2. esperamos 400ms antes de copiar esse valor para debouncedSearchText.
+  // 3. como a API usa debouncedSearchText, evitamos uma request a cada tecla.
   useEffect(() => {
+    // Agenda a atualização da busca para daqui a 400ms.
     const timeoutId = setTimeout(() => {
       setDebouncedSearchText(searchText)
       setCurrentPage(1)
     }, 400)
 
+    // Se o usuário digitar de novo antes dos 400ms, cancelamos o timer anterior.
     return () => clearTimeout(timeoutId)
   }, [searchText])
 
@@ -150,7 +155,7 @@ export function EquipmentPage() {
     pageSize,
   }
 
-  // Hooks que conversam com a API usando TanStack Query por baixo.
+  // Hooks que usam useEffect + axios para buscar e salvar dados na API.
   const equipmentListQuery = useEquipmentList(listParams)
   const equipmentSummaryQuery = useEquipmentSummary()
   const locationOptionsQuery = useEquipmentLocationOptions()
@@ -175,8 +180,8 @@ export function EquipmentPage() {
     equipmentListQuery.errorMessage ||
     equipmentSummaryQuery.errorMessage ||
     locationOptionsQuery.errorMessage
-  const isSavingForm = createEquipment.isPending || updateEquipment.isPending
-  const isSavingStatus = updateEquipmentStatus.isPending
+  const isSavingForm = createEquipment.isLoading || updateEquipment.isLoading
+  const isSavingStatus = updateEquipmentStatus.isLoading
 
   // A tabela espera receber o nome da localização, não apenas o ID.
   const visibleEquipment = equipments.map((equipment) =>
@@ -212,16 +217,17 @@ export function EquipmentPage() {
 
     try {
       if (formMode === 'edit' && equipmentInForm) {
-        await updateEquipment.mutateAsync({
+        await updateEquipment.update({
           equipmentId: equipmentInForm.id,
           payload,
         })
         messageApi.success('Equipamento atualizado com sucesso.')
       } else {
-        await createEquipment.mutateAsync(payload)
+        await createEquipment.create(payload)
         messageApi.success('Equipamento cadastrado com sucesso.')
       }
 
+      await Promise.all([equipmentListQuery.reload(), equipmentSummaryQuery.reload()])
       handleCloseFormModal()
     } catch (error) {
       messageApi.error(getRequestErrorMessage(error))
@@ -241,7 +247,7 @@ export function EquipmentPage() {
     }
 
     try {
-      await updateEquipmentStatus.mutateAsync({
+      await updateEquipmentStatus.updateStatus({
         equipmentId: equipmentInStatus.id,
         payload: {
           status: values.status,
@@ -249,6 +255,7 @@ export function EquipmentPage() {
         },
       })
 
+      await Promise.all([equipmentListQuery.reload(), equipmentSummaryQuery.reload()])
       messageApi.success('Status atualizado com sucesso.')
       setEquipmentInStatus(undefined)
     } catch (error) {

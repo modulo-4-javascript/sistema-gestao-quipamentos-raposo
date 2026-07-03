@@ -126,8 +126,8 @@ export function EquipmentDetailsPage() {
     (!equipmentId ? 'ID do equipamento não encontrado na rota.' : '') ||
     equipmentQuery.errorMessage ||
     locationOptionsQuery.errorMessage
-  const isSavingForm = updateEquipment.isPending
-  const isSavingStatus = updateEquipmentStatus.isPending
+  const isSavingForm = updateEquipment.isLoading
+  const isSavingStatus = updateEquipmentStatus.isLoading
 
   const summaries = useMemo(
     () => (equipment ? buildDetailSummary(equipment) : []),
@@ -152,10 +152,11 @@ export function EquipmentDetailsPage() {
     }
 
     try {
-      await updateEquipment.mutateAsync({
+      await updateEquipment.update({
         equipmentId: equipmentInForm.id,
         payload: buildEquipmentPayload(values),
       })
+      await equipmentQuery.reload()
       messageApi.success('Equipamento atualizado com sucesso.')
       setEquipmentInForm(undefined)
     } catch (error) {
@@ -169,13 +170,14 @@ export function EquipmentDetailsPage() {
     }
 
     try {
-      await updateEquipmentStatus.mutateAsync({
+      await updateEquipmentStatus.updateStatus({
         equipmentId: equipmentInStatus.id,
         payload: {
           status: values.status,
           note: values.note?.trim() || null,
         },
       })
+      await equipmentQuery.reload()
       messageApi.success('Status atualizado com sucesso.')
       setEquipmentInStatus(undefined)
     } catch (error) {

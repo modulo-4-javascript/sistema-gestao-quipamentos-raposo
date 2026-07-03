@@ -174,7 +174,7 @@ Exemplo:
 GET /api/v1/equipment
 ```
 
-Esse `GET` pede a lista de equipamentos. A API responde com JSON. O TanStack Query guarda essa resposta e a tela renderiza a tabela.
+Esse `GET` pede a lista de equipamentos. A API responde com JSON, o hook guarda a resposta em estado React e a tela renderiza a tabela.
 
 ## Camadas usadas na integração
 
@@ -210,9 +210,9 @@ Arquivo:
 frontend/src/features/equipment/hooks/useEquipmentQueries.ts
 ```
 
-Aqui ficam os `useQuery` e `useMutation`.
+Aqui ficam hooks com `useState` e `useEffect`.
 
-Eles controlam loading, erro, cache básico e atualização da tela depois de criar, editar ou alterar status.
+Eles controlam loading, erro, dados recebidos da API e atualização manual depois de criar, editar ou alterar status.
 
 ### Types
 

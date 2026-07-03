@@ -1,9 +1,10 @@
 # Aula 07 - Guia do aluno: integração com backend
 
-Nesta aula vamos ligar as telas de Equipamentos na API usando duas ferramentas:
+Nesta aula vamos ligar as telas de Equipamentos na API usando React e Axios:
 
 - `axios`, para fazer as chamadas HTTP;
-- `@tanstack/react-query`, para controlar busca, loading, erro e atualizacao dos dados.
+- `useState`, para guardar dados, loading e erro;
+- `useEffect`, para buscar dados quando a tela abrir ou quando filtros mudarem.
 
 A ideia e descomentar/conferir as partes em ordem:
 
@@ -84,7 +85,7 @@ chama:
 /api/v1/equipment
 ```
 
-## Passo 2 - Descomentar o provider do TanStack Query
+## Passo 2 - Conferir a base da aplicação
 
 Arquivo:
 
@@ -92,35 +93,21 @@ Arquivo:
 frontend/src/app/App.tsx
 ```
 
-Confira os imports:
-
-```ts
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-```
-
-Confira o client:
-
-```ts
-const queryClient = new QueryClient()
-```
-
-E confira o provider envolvendo a aplicacao:
+Confira se a aplicação continua envolvida pelo Ant Design e pelo React Router:
 
 ```tsx
-<QueryClientProvider client={queryClient}>
-  <AntDesignApp>
-    <BrowserRouter>
-      <AppRoutes />
-    </BrowserRouter>
-  </AntDesignApp>
-</QueryClientProvider>
+<AntDesignApp>
+  <BrowserRouter>
+    <AppRoutes />
+  </BrowserRouter>
+</AntDesignApp>
 ```
 
 O que entender:
 
-- o QueryClient guarda cache e estado das requisicoes;
-- sem provider, `useQuery` e `useMutation` nao funcionam;
-- o provider fica no topo da aplicacao.
+- o `BrowserRouter` habilita as rotas;
+- o `AntDesignApp` habilita recursos do Ant Design, como mensagens e modais;
+- a integração com API fica nas páginas, hooks e services.
 
 ## Passo 3 - Descomentar o service de Equipamentos
 
@@ -249,14 +236,40 @@ Hook da listagem:
 
 ```ts
 export function useEquipmentList(params: GetEquipmentListParams) {
-  const query = useQuery({
-    queryKey: ['equipment', params],
-    queryFn: () => equipmentService.getEquipmentList(params),
-  })
+  const { page, pageSize, search, status, type } = params
+  const [data, setData] = useState<PaginatedResult<Equipment>>()
+  const [isLoading, setIsLoading] = useState(true)
+  const [errorMessage, setErrorMessage] = useState('')
+
+  async function loadEquipmentList() {
+    setIsLoading(true)
+    setErrorMessage('')
+
+    try {
+      const result = await equipmentService.getEquipmentList({
+        page,
+        pageSize,
+        search,
+        status,
+        type,
+      })
+      setData(result)
+    } catch (error) {
+      setErrorMessage(getRequestErrorMessage(error))
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    void loadEquipmentList()
+  }, [page, pageSize, search, status, type])
 
   return {
-    ...query,
-    errorMessage: query.error ? getRequestErrorMessage(query.error) : '',
+    data,
+    isLoading,
+    errorMessage,
+    reload: loadEquipmentList,
   }
 }
 ```
@@ -265,27 +278,37 @@ Hook de criacao:
 
 ```ts
 export function useCreateEquipment() {
-  const queryClient = useQueryClient()
-  const mutation = useMutation({
-    mutationFn: (payload: CreateEquipmentPayload) => equipmentService.createEquipment(payload),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['equipment'] })
-    },
-  })
+  const [isLoading, setIsLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+
+  async function create(payload: CreateEquipmentPayload) {
+    setIsLoading(true)
+    setErrorMessage('')
+
+    try {
+      return await equipmentService.createEquipment(payload)
+    } catch (error) {
+      setErrorMessage(getRequestErrorMessage(error))
+      throw error
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return {
-    ...mutation,
-    errorMessage: mutation.error ? getRequestErrorMessage(mutation.error) : '',
+    create,
+    isLoading,
+    errorMessage,
   }
 }
 ```
 
 O que entender:
 
-- `useQuery` busca e guarda dados;
-- `useMutation` cria/edita/altera dados;
-- `invalidateQueries` manda buscar novamente depois de salvar;
-- cada hook devolve `errorMessage` simples.
+- `useState` guarda dados, loading e erro;
+- `useEffect` chama a API quando a tela precisa carregar dados;
+- `reload` permite buscar novamente depois de salvar;
+- cada hook devolve uma função simples para a página usar.
 
 ## Passo 5 - Descomentar a listagem na pagina
 
@@ -315,12 +338,18 @@ const [pageSize, setPageSize] = useState(10)
 Confira o debounce da busca:
 
 ```ts
+// Debounce da busca:
+// 1. searchText muda a cada tecla digitada.
+// 2. esperamos 400ms antes de copiar esse valor para debouncedSearchText.
+// 3. como a API usa debouncedSearchText, evitamos uma request a cada tecla.
 useEffect(() => {
+  // Agenda a atualização da busca para daqui a 400ms.
   const timeoutId = setTimeout(() => {
     setDebouncedSearchText(searchText)
     setCurrentPage(1)
   }, 400)
 
+  // Se o usuário digitar de novo antes dos 400ms, cancelamos o timer anterior.
   return () => clearTimeout(timeoutId)
 }, [searchText])
 ```
@@ -431,13 +460,13 @@ const updateEquipment = useUpdateEquipment()
 Criacao:
 
 ```ts
-await createEquipment.mutateAsync(payload)
+await createEquipment.create(payload)
 ```
 
 Edicao:
 
 ```ts
-await updateEquipment.mutateAsync({
+await updateEquipment.update({
   equipmentId: equipmentInForm.id,
   payload,
 })
@@ -445,9 +474,9 @@ await updateEquipment.mutateAsync({
 
 O que entender:
 
-- `mutateAsync` executa a alteracao;
-- `onSuccess` no hook invalida as queries;
-- a lista atualiza sem chamar `useEffect` manual.
+- `create` faz `POST`;
+- `update` faz `PUT`;
+- depois de salvar, a página chama `reload` para recarregar lista e resumo.
 
 Checkpoint:
 
@@ -466,7 +495,7 @@ const updateEquipmentStatus = useUpdateEquipmentStatus()
 Confira o envio:
 
 ```ts
-await updateEquipmentStatus.mutateAsync({
+await updateEquipmentStatus.updateStatus({
   equipmentId: equipmentInStatus.id,
   payload: {
     status: values.status,
@@ -479,8 +508,7 @@ O que entender:
 
 - status usa `PATCH`;
 - a observacao vira `note`;
-- ao salvar, o hook invalida os dados de equipamentos;
-- a tela busca novamente.
+- depois de salvar, a tela chama `reload` para buscar os dados atualizados.
 
 Checkpoint:
 
@@ -499,7 +527,7 @@ api.ts -> locationService -> hooks -> pagina -> componentes
 Entrega esperada:
 
 - service de localizacoes usando `axiosApi.get`, `axiosApi.post`, `axiosApi.put`, `axiosApi.patch`;
-- hooks usando `useQuery` e `useMutation`;
+- hooks usando `useState` e `useEffect`;
 - tratamento simples com `errorMessage`;
 - loading;
 - erro;
@@ -512,7 +540,7 @@ Voce precisa sair sabendo explicar:
 
 - por que usamos `axios.create`;
 - por que o service nao deve ficar dentro da pagina;
-- o que `useQuery` faz;
-- o que `useMutation` faz;
-- por que invalidamos queries depois de salvar;
+- como `useEffect` busca dados da API;
+- como `useState` guarda dados, loading e erro;
+- por que chamamos `reload` depois de salvar;
 - como o erro vira uma mensagem simples.
