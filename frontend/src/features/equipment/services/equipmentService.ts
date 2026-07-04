@@ -3,6 +3,7 @@ import type {
   CreateEquipmentPayload,
   Equipment,
   EquipmentDetail,
+  EquipmentHistoryItem,
   EquipmentLocationOption,
   EquipmentStatus,
   EquipmentSummaryResponse,
@@ -81,6 +82,20 @@ export const equipmentService = {
     const response = await axiosApi.patch<EquipmentDetail>(
       `/equipment/${equipmentId}/status`,
       payload,
+    )
+
+    return response.data
+  },
+
+  // Remove um equipamento usando DELETE.
+  async deleteEquipment(equipmentId: string): Promise<void> {
+    await axiosApi.delete(`/equipment/${equipmentId}`)
+  },
+
+  // Lista o histórico completo de um equipamento.
+  async getEquipmentHistory(equipmentId: string): Promise<EquipmentHistoryItem[]> {
+    const response = await axiosApi.get<EquipmentHistoryItem[]>(
+      `/equipment/${equipmentId}/history`,
     )
 
     return response.data

@@ -16,6 +16,7 @@ import type { EquipmentStatusFormValues } from '../../components/EquipmentStatus
 import { EquipmentTable } from '../../components/EquipmentTable'
 import { getRequestErrorMessage } from '../../../../shared/http/getRequestErrorMessage'
 import { useCreateEquipment } from '../../hooks/useCreateEquipment'
+import { useDeleteEquipment } from '../../hooks/useDeleteEquipment'
 import { useEquipmentList } from '../../hooks/useEquipmentList'
 import { useEquipmentLocationOptions } from '../../hooks/useEquipmentLocationOptions'
 import { useEquipmentSummary } from '../../hooks/useEquipmentSummary'
@@ -162,6 +163,7 @@ export function EquipmentPage() {
   const createEquipment = useCreateEquipment()
   const updateEquipment = useUpdateEquipment()
   const updateEquipmentStatus = useUpdateEquipmentStatus()
+  const deleteEquipment = useDeleteEquipment()
 
   // Aqui tiramos os dados de dentro dos hooks e colocamos valores seguros para renderizar.
   const locationOptions = locationOptionsQuery.data ?? []
@@ -182,6 +184,7 @@ export function EquipmentPage() {
     locationOptionsQuery.errorMessage
   const isSavingForm = createEquipment.isLoading || updateEquipment.isLoading
   const isSavingStatus = updateEquipmentStatus.isLoading
+  const isRemovingEquipment = deleteEquipment.isLoading
 
   // A tabela espera receber o nome da localização, não apenas o ID.
   const visibleEquipment = equipments.map((equipment) =>
@@ -234,10 +237,26 @@ export function EquipmentPage() {
     }
   }
 
-  function handleConfirmRemoveEquipment() {
-    // TODO Aula futura: conectar DELETE /equipment/:equipmentId se o escopo incluir exclusão.
-    messageApi.info('Exclusão deixada como evolução após a integração principal.')
-    setEquipmentToRemove(undefined)
+  async function handleConfirmRemoveEquipment() {
+    if (!equipmentToRemove) {
+      return
+    }
+
+    try {
+      await deleteEquipment.remove(equipmentToRemove.id)
+      messageApi.success('Equipamento excluído com sucesso.')
+      setEquipmentToRemove(undefined)
+
+      if (currentPage > 1 && equipments.length === 1) {
+        setCurrentPage((page) => Math.max(1, page - 1))
+        await equipmentSummaryQuery.reload()
+        return
+      }
+
+      await Promise.all([equipmentListQuery.reload(), equipmentSummaryQuery.reload()])
+    } catch (error) {
+      messageApi.error(getRequestErrorMessage(error))
+    }
   }
 
   // Alterar status é uma ação menor, por isso usa um modal separado do formulário completo.
@@ -379,8 +398,9 @@ export function EquipmentPage() {
           onSubmit={handleSubmitStatusModal}
         />
 
-        {/* Exclusão ainda é visual nesta aula; o DELETE fica como evolução. */}
+        {/* Modal de confirmação que chama DELETE /equipment/:equipmentId. */}
         <EquipmentRemoveModal
+          confirmLoading={isRemovingEquipment}
           equipment={equipmentToRemove}
           open={Boolean(equipmentToRemove)}
           onCancel={() => setEquipmentToRemove(undefined)}

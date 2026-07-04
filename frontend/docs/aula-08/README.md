@@ -3,9 +3,12 @@
 Nesta branch, Equipamentos já está integrado com a API. O trabalho final de casa
 é completar Localizações por conta própria, usando Equipamentos como referência.
 
+O escopo da atividade é frontend. A API de Localizações já possui as rotas
+necessárias; os alunos devem consumir essas rotas pelo `locationService`.
+
 Este material precisa funcionar sem acompanhamento em sala. A branch deixa a
 base visual e as partes mais difíceis semiprontas em comentários, para os alunos
-terem um mapa durante o fim de semana, mas ainda precisarem implementar os
+terem um mapa fora da aula, mas ainda precisarem implementar os
 hooks, modais e fluxos.
 
 ## Estado inicial
@@ -20,6 +23,17 @@ Já está pronto:
 - `useLocationList` e `useLocationSummary`;
 - página `/locations` renderizando só o cabeçalho;
 - blocos comentados em `LocationsPage` para cards, filtros, tabela, ações e modais.
+
+Equipamentos deve servir como a implementação de referência. Antes de liberar a
+atividade, confira especialmente se estes fluxos estão funcionando:
+
+- listagem, busca, filtros e paginação;
+- criação e edição;
+- alteração de status;
+- exclusão real com `DELETE /equipment/:equipmentId`;
+- detalhe por rota dinâmica;
+- recarregamento da tela depois de salvar ou excluir;
+- tratamento de erro com `getRequestErrorMessage`.
 
 Falta os alunos implementarem:
 
@@ -83,10 +97,10 @@ sequenceDiagram
 6. Criar os hooks que faltam.
 7. Criar os modais de formulário, situação e exclusão.
 8. Substituir mensagens temporárias por ações reais.
-9. Criar a rota e a página de detalhe.
+9. Criar a rota em `src/app/routes.tsx` e a página de detalhe.
 10. Validar loading, erro, estado vazio e reload depois de salvar.
 
-## Organização para o Fim de Semana
+## Organização do Trabalho
 
 Oriente os alunos a não tentar resolver tudo de uma vez. A sequência de entrega
 mais saudável é:
@@ -134,6 +148,19 @@ GET    /api/v1/locations/:locationId/equipment
 GET    /api/v1/locations/:locationId/equipment-history
 ```
 
+## Contratos importantes
+
+O backend valida os dados. Se os alunos tiverem erro `422`, peça para comparar
+o payload enviado pelo frontend com estes pontos:
+
+- `code`: obrigatório, 2 a 20 caracteres, somente letras maiúsculas, números e `-`;
+- `name`: obrigatório, 2 a 120 caracteres;
+- `type`: obrigatório na criação;
+- `status`: `ACTIVE` ou `INACTIVE`;
+- `description`: pode ser texto ou `null`;
+- `DELETE /locations/:locationId`: retorna `204` sem corpo quando exclui;
+- localização com equipamentos vinculados retorna erro `409`.
+
 ## Reaproveitamento visual
 
 Já estão em `shared`:
@@ -152,6 +179,25 @@ Podem ser copiados de Equipamentos para Localizações:
 - `EquipmentRemoveModal` -> `LocationRemoveModal`;
 - `DetailsHeader` -> cabeçalho de detalhe de localização;
 - `DetailSummaryCards` -> cards do detalhe.
+
+Hooks úteis de Equipamentos para usar como molde:
+
+- `useEquipmentList` e `useEquipmentSummary` para leitura automática com `reload`;
+- `useEquipmentDetails` para buscar por ID da URL;
+- `useCreateEquipment`, `useUpdateEquipment` e `useUpdateEquipmentStatus` para escrita;
+- `useDeleteEquipment` para exclusão com modal de confirmação.
+
+## Pontos de acompanhamento
+
+Quando revisar entregas ou tirar dúvidas, confira nesta ordem:
+
+1. A tela compila depois de cada bloco descomentado.
+2. Os imports foram ativados junto com o código que usa cada símbolo.
+3. Os hooks chamam o `locationService`, não o `axiosApi` diretamente.
+4. As actions recarregam lista e resumo depois de criar, editar, mudar status ou excluir.
+5. O erro de exclusão bloqueada aparece para o usuário.
+6. A rota de detalhe foi registrada em `src/app/routes.tsx`.
+7. `npm run build` passa no frontend.
 
 ## Critérios de aceite
 

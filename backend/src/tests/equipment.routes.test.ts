@@ -80,6 +80,40 @@ describe("Equipment routes", () => {
     });
   });
 
+  it("deletes equipment and registers history", async () => {
+    const deleteResponse = await request(app).delete(
+      `/api/v1/equipment/${EQUIPMENT_SEED_IDS.notebook}`
+    );
+
+    expect(deleteResponse.status).toBe(204);
+
+    const getResponse = await request(app).get(
+      `/api/v1/equipment/${EQUIPMENT_SEED_IDS.notebook}`
+    );
+    expect(getResponse.status).toBe(404);
+
+    const listResponse = await request(app).get("/api/v1/equipment");
+    expect(listResponse.body.meta.total).toBe(5);
+    expect(listResponse.body.data).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: EQUIPMENT_SEED_IDS.notebook })
+      ])
+    );
+
+    const historyResponse = await request(app).get(
+      `/api/v1/locations/${LOCATION_SEED_IDS.lab01}/equipment-history`
+    );
+    expect(historyResponse.body.data).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: EquipmentHistoryType.DELETED,
+          equipmentId: EQUIPMENT_SEED_IDS.notebook,
+          fromLocationId: LOCATION_SEED_IDS.lab01
+        })
+      ])
+    );
+  });
+
   it("updates equipment status", async () => {
     const response = await request(app)
       .patch(`/api/v1/equipment/${EQUIPMENT_SEED_IDS.notebook}/status`)

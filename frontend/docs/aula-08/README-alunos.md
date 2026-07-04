@@ -7,7 +7,10 @@ base pronta: types, service, dois hooks e uma página que renderiza só o
 cabeçalho. Cards, filtros, tabela, ações e modais estão como blocos comentados
 para você ativar aos poucos.
 
-Este trabalho foi pensado para ser feito durante o fim de semana. Leia o roteiro
+O backend já tem as rotas de Localizações. Seu trabalho é completar o frontend:
+criar hooks, componentes, estados de tela e chamadas ao `locationService`.
+
+Este trabalho foi pensado para ser fora da aula. Leia o roteiro
 com calma, implemente uma parte por vez e teste no navegador antes de avançar.
 
 ## O que você vai construir
@@ -32,15 +35,29 @@ Rode o projeto e confira se Equipamentos funciona:
 npm run dev
 ```
 
+Esse comando deve subir o frontend e a API. No navegador, confira:
+
+```txt
+/equipment
+/locations
+```
+
+Em `/equipment`, teste pelo menos uma ação de cada tipo: listar, criar, editar,
+mudar status, excluir e abrir detalhe. Em `/locations`, o estado inicial esperado
+é aparecer só o cabeçalho com o botão "Novo local".
+
 Depois abra:
 
 ```txt
 frontend/src/features/equipment/pages/EquipmentPage/index.tsx
+frontend/src/features/equipment/pages/EquipmentDetailsPage/index.tsx
 frontend/src/features/equipment/services/equipmentService.ts
 frontend/src/features/equipment/hooks/useEquipmentList.ts
+frontend/src/features/equipment/hooks/useEquipmentDetails.ts
 frontend/src/features/equipment/components/EquipmentFormModal
 frontend/src/features/equipment/components/EquipmentStatusModal
 frontend/src/features/equipment/components/EquipmentRemoveModal
+frontend/src/features/equipment/hooks/useDeleteEquipment.ts
 ```
 
 O padrão que você vai repetir é:
@@ -49,7 +66,7 @@ O padrão que você vai repetir é:
 service -> hook -> página -> componente visual
 ```
 
-## Estratégia para o Fim de Semana
+## Estratégia
 
 Não comece pelos modais. A ordem mais segura é:
 
@@ -190,6 +207,23 @@ async createLocation(payload: CreateLocationPayload): Promise<LocationDetails> {
 
 Isso significa: o hook não precisa saber URL. O hook chama o service.
 
+Mapa do service de Localizações:
+
+| Função do service | Rota usada | Onde você provavelmente usa |
+| --- | --- | --- |
+| `getLocationList` | `GET /locations` | tabela principal |
+| `getLocationSummary` | `GET /locations/summary` | cards do topo |
+| `getLocationById` | `GET /locations/:id` | página de detalhe |
+| `createLocation` | `POST /locations` | formulário de criação |
+| `updateLocation` | `PUT /locations/:id` | formulário de edição |
+| `updateLocationStatus` | `PATCH /locations/:id/status` | modal de situação |
+| `deleteLocation` | `DELETE /locations/:id` | modal de exclusão |
+| `getLocationEquipment` | `GET /locations/:id/equipment` | detalhe: equipamentos vinculados |
+| `getLocationHistory` | `GET /locations/:id/equipment-history` | detalhe: histórico |
+
+Regra importante: a página chama o hook, o hook chama o service, o service chama
+a API.
+
 ## Passo 2 - Criar os hooks que faltam
 
 Já existem:
@@ -217,7 +251,21 @@ Use os hooks de Equipamentos como modelo:
 frontend/src/features/equipment/hooks/useCreateEquipment.ts
 frontend/src/features/equipment/hooks/useUpdateEquipment.ts
 frontend/src/features/equipment/hooks/useUpdateEquipmentStatus.ts
+frontend/src/features/equipment/hooks/useDeleteEquipment.ts
+frontend/src/features/equipment/hooks/useEquipmentDetails.ts
 ```
+
+Referência rápida:
+
+| Hook novo | Modelo mais parecido | Função do service |
+| --- | --- | --- |
+| `useLocationDetails` | `useEquipmentDetails` | `getLocationById` |
+| `useCreateLocation` | `useCreateEquipment` | `createLocation` |
+| `useUpdateLocation` | `useUpdateEquipment` | `updateLocation` |
+| `useUpdateLocationStatus` | `useUpdateEquipmentStatus` | `updateLocationStatus` |
+| `useDeleteLocation` | `useDeleteEquipment` | `deleteLocation` |
+| `useLocationEquipment` | `useEquipmentList` | `getLocationEquipment` |
+| `useLocationHistory` | `useEquipmentList` | `getLocationHistory` |
 
 Diagrama do hook:
 
@@ -237,6 +285,22 @@ sequenceDiagram
   Hook->>Hook: setIsLoading(false)
   Hook-->>Page: resolve ou lança erro
 ```
+
+Checklist de cada hook de escrita:
+
+- `isLoading` começa `false`;
+- `errorMessage` começa `''`;
+- antes da request: `setIsLoading(true)` e `setErrorMessage('')`;
+- em caso de erro: salvar `getRequestErrorMessage(error)` e lançar o erro de novo;
+- no `finally`: `setIsLoading(false)`;
+- quem chama o hook decide quando recarregar lista, resumo ou detalhe.
+
+Checklist de cada hook de leitura:
+
+- guardar `data`, `isLoading` e `errorMessage`;
+- usar `useCallback` para criar a função de carregamento;
+- chamar essa função em `useEffect`;
+- retornar também `reload`, para a página conseguir atualizar os dados depois de salvar.
 
 ## Passo 3 - Criar o formulário
 
@@ -262,6 +326,19 @@ Campos esperados:
 - `room`: opcional;
 - `description`: opcional;
 - `status`: opcional ou obrigatório, conforme sua decisão de UX.
+
+Mesmo que `type` e `status` estejam opcionais no tipo TypeScript do formulário,
+você pode exigir esses campos nas regras do `Form.Item`.
+
+Regras da API que ajudam a evitar erro de validação:
+
+- `code` precisa ter entre 2 e 20 caracteres;
+- `code` aceita letras maiúsculas, números e hífen. Exemplo: `LAB-03`;
+- `name` precisa ter pelo menos 2 caracteres;
+- `type` deve ser um dos valores de `locationTypeOptions`;
+- `status` deve ser `ACTIVE` ou `INACTIVE`;
+- campos de texto vazios podem ser enviados como `undefined` ou `null`, seguindo o
+  exemplo de Equipamentos.
 
 Tipo sugerido:
 
@@ -332,6 +409,9 @@ Payload esperado:
 }
 ```
 
+Mesmo que o backend aceite `note`, a tela precisa pelo menos enviar `status`.
+Depois de salvar, recarregue lista e resumo.
+
 Fluxo:
 
 ```mermaid
@@ -372,6 +452,14 @@ A API bloqueia exclusão quando existe equipamento vinculado. Por isso, use:
 ```ts
 messageApi.error(getRequestErrorMessage(error))
 ```
+
+Detalhes importantes:
+
+- exclusão bem-sucedida retorna `204` e não tem `response.data` útil;
+- use `confirmLoading` no modal para evitar duplo clique durante a request;
+- depois de excluir, recarregue lista e resumo;
+- se a API bloquear, mantenha a tela aberta ou feche só se fizer sentido para sua UX,
+  mas mostre a mensagem de erro.
 
 Fluxo:
 
@@ -414,7 +502,7 @@ frontend/src/features/locations/pages/LocationDetailsPage/styles.ts
 Adicione rota em:
 
 ```txt
-frontend/src/app/App.tsx
+frontend/src/app/routes.tsx
 ```
 
 Rota sugerida:
@@ -437,6 +525,18 @@ Conteúdo esperado:
 - cards com resumo de equipamentos;
 - tabela/lista de equipamentos vinculados;
 - histórico de movimentações.
+
+Na navegação da tabela, use `useNavigate`:
+
+```ts
+navigate(`/locations/${location.id}`)
+```
+
+Na página de detalhe, trate três estados:
+
+- carregando;
+- erro ou ID ausente;
+- dados carregados.
 
 ## Passo 9 - Reaproveitar componentes compartilhados
 
@@ -462,6 +562,28 @@ Pode copiar de Equipamentos quando ainda for específico:
 - cards do detalhe.
 
 Regra prática: copie primeiro para entender; só mova para `shared` quando dois módulos realmente usarem a mesma coisa.
+
+## Como testar durante o trabalho
+
+Depois de cada etapa, teste no navegador:
+
+1. Recarregue a página e veja se não ficou tela branca.
+2. Abra o console do navegador e confira se não há erro de JavaScript.
+3. Use a aba Network para confirmar se a rota chamada é a rota esperada.
+4. Teste sucesso e erro quando existir erro esperado, como excluir localização com equipamento.
+5. Rode `npm run build` antes de considerar a entrega final.
+
+Se algo quebrar, volte para o último passo que funcionava. Não tente ativar
+todos os blocos e todos os modais ao mesmo tempo.
+
+## Dicas para destravar
+
+- Erro de import normalmente significa bloco descomentado pela metade.
+- Erro `422` normalmente significa payload diferente do contrato da API.
+- Erro `404` no detalhe normalmente significa rota ou `locationId` errado.
+- Se a tabela não atualiza depois de salvar, confira se chamou `reload`.
+- Se o modal abre vazio na edição, confira o `useEffect` e `form.setFieldsValue`.
+- Se o botão fica carregando para sempre, confira se existe `finally`.
 
 ## Checklist de entrega
 

@@ -4,6 +4,7 @@ import { Hint, Message, RemoveModal } from './styles'
 interface EquipmentRemoveModalProps {
   equipment?: Equipment
   open: boolean
+  confirmLoading?: boolean
   onCancel: () => void
   onConfirm: () => void
 }
@@ -11,6 +12,7 @@ interface EquipmentRemoveModalProps {
 export function EquipmentRemoveModal({
   equipment,
   open,
+  confirmLoading,
   onCancel,
   onConfirm,
 }: EquipmentRemoveModalProps) {
@@ -23,6 +25,7 @@ export function EquipmentRemoveModal({
       title="Excluir equipamento"
       okText="Excluir"
       cancelText="Cancelar"
+      confirmLoading={confirmLoading}
       okButtonProps={{ danger: true }}
       width={440}
       maskStyle={{

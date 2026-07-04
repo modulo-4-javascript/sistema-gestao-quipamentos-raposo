@@ -13,6 +13,7 @@ import { EquipmentRemoveModal } from '../../components/EquipmentRemoveModal'
 import { EquipmentStatusModal } from '../../components/EquipmentStatusModal'
 import type { EquipmentStatusFormValues } from '../../components/EquipmentStatusModal'
 import { getRequestErrorMessage } from '../../../../shared/http/getRequestErrorMessage'
+import { useDeleteEquipment } from '../../hooks/useDeleteEquipment'
 import { useEquipmentDetails } from '../../hooks/useEquipmentDetails'
 import { useEquipmentLocationOptions } from '../../hooks/useEquipmentLocationOptions'
 import { useUpdateEquipment } from '../../hooks/useUpdateEquipment'
@@ -114,6 +115,7 @@ export function EquipmentDetailsPage() {
   const locationOptionsQuery = useEquipmentLocationOptions()
   const updateEquipment = useUpdateEquipment()
   const updateEquipmentStatus = useUpdateEquipmentStatus()
+  const deleteEquipment = useDeleteEquipment()
 
   // Garante que a tela sempre tenha uma lista de localizações, mesmo antes da API responder.
   const locationOptions = useMemo(
@@ -138,6 +140,7 @@ export function EquipmentDetailsPage() {
     locationOptionsQuery.errorMessage
   const isSavingForm = updateEquipment.isLoading
   const isSavingStatus = updateEquipmentStatus.isLoading
+  const isRemovingEquipment = deleteEquipment.isLoading
 
   // Cards de resumo são derivados do equipamento carregado.
   const summaries = useMemo(
@@ -200,10 +203,19 @@ export function EquipmentDetailsPage() {
     }
   }
 
-  function handleConfirmRemoveEquipment() {
-    // TODO Aula futura: conectar DELETE /equipment/:equipmentId se o escopo incluir exclusão.
-    messageApi.info('Exclusão deixada como evolução após a integração principal.')
-    setEquipmentToRemove(undefined)
+  async function handleConfirmRemoveEquipment() {
+    if (!equipmentToRemove) {
+      return
+    }
+
+    try {
+      await deleteEquipment.remove(equipmentToRemove.id)
+      messageApi.success('Equipamento excluído com sucesso.')
+      setEquipmentToRemove(undefined)
+      navigate('/equipment')
+    } catch (error) {
+      messageApi.error(getRequestErrorMessage(error))
+    }
   }
 
   // Enquanto o detalhe ou as localizações carregam, mostramos um estado simples de espera.
@@ -285,8 +297,9 @@ export function EquipmentDetailsPage() {
           onSubmit={handleSubmitStatusModal}
         />
 
-        {/* Exclusão ainda é visual nesta aula; o DELETE fica como evolução. */}
+        {/* Modal de confirmação que chama DELETE /equipment/:equipmentId. */}
         <EquipmentRemoveModal
+          confirmLoading={isRemovingEquipment}
           equipment={equipmentToRemove}
           open={Boolean(equipmentToRemove)}
           onCancel={() => setEquipmentToRemove(undefined)}
