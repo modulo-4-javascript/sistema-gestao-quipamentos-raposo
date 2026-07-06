@@ -1,17 +1,20 @@
 import { Card } from 'antd'
 import styled from 'styled-components'
 
-interface EventProps {
-  $active?: boolean
-}
-
 export const ListCard = styled(Card)`
   &.ant-card {
+    height: 100%;
     border-color: #dde6ee;
     border-radius: 8px;
     box-shadow:
       0 1px 2px rgb(17 24 39 / 6%),
       0 8px 20px rgb(17 24 39 / 4%);
+  }
+
+  .ant-card-body {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
   }
 `
 
@@ -42,8 +45,10 @@ export const Timeline = styled.ol`
   position: relative;
   display: grid;
   gap: 24px;
+  max-height: 310px;
   margin: 0;
-  padding: 0 0 0 30px;
+  overflow-y: auto;
+  padding: 0 8px 0 30px;
   list-style: none;
 
   &::before {
@@ -57,7 +62,7 @@ export const Timeline = styled.ol`
   }
 `
 
-export const Event = styled.li<EventProps>`
+export const Event = styled.li`
   position: relative;
 
   &::before {
@@ -67,7 +72,7 @@ export const Event = styled.li<EventProps>`
     left: -30px;
     width: 12px;
     height: 12px;
-    background: ${({ $active }) => ($active ? '#002a64' : '#dde6ee')};
+    background: #007c8c;
     border-radius: 999px;
     box-shadow: 0 0 0 3px #ffffff;
   }

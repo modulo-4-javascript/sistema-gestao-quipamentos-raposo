@@ -10,6 +10,7 @@ export const ContentGrid = styled.div`
   grid-template-columns: minmax(0, 2fr) minmax(360px, 0.85fr);
   align-items: stretch;
   gap: 24px;
+  margin-bottom: 24px;
 
   @media (max-width: 1100px) {
     grid-template-columns: 1fr;

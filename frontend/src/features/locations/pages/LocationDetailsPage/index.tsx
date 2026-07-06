@@ -36,7 +36,7 @@ import {
   StarterBox,
 } from './styles'
 
-const equipmentPreviewSize = 2
+const locationEquipmentPageSize = 100
 
 function buildLocationPayload(values: LocationFormValues): CreateLocationPayload {
   return {
@@ -94,7 +94,7 @@ export function LocationDetailsPage() {
   const locationQuery = useLocationDetails(locationId)
   const equipmentQuery = useLocationEquipment(locationId, {
     page: 1,
-    pageSize: equipmentPreviewSize,
+    pageSize: locationEquipmentPageSize,
   })
   const updateLocation = useUpdateLocation()
   const updateLocationStatus = useUpdateLocationStatus()
@@ -224,20 +224,19 @@ export function LocationDetailsPage() {
         <ContentGrid>
           <MainColumn>
             <LocationInfoCard location={location} />
-            <LocationNotesCard description={location.description} />
           </MainColumn>
 
           <SideColumn>
             <LocationEquipmentCard
               equipment={linkedEquipment}
-              equipmentSummary={location.equipmentSummary}
               errorMessage={equipmentQuery.errorMessage}
               loading={equipmentQuery.isLoading}
-              onViewAllEquipment={() => navigate('/equipment')}
               onViewEquipment={(equipment) => navigate(`/equipment/${equipment.id}`)}
             />
           </SideColumn>
         </ContentGrid>
+
+        <LocationNotesCard description={location.description} />
 
         <LocationFormModal
           confirmLoading={isSavingForm}
