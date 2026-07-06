@@ -131,7 +131,7 @@ export const FullField = styled.div`
   grid-column: 1 / -1;
 `
 
-export const StatusModal = styled(Modal)`
+export const StyledStatusModal = styled(Modal)`
   .ant-modal-content {
     overflow: hidden;
     padding: 0;
@@ -239,7 +239,7 @@ export const CurrentStatusText = styled.p`
   line-height: normal;
 `
 
-export const RemoveModal = styled(Modal)`
+export const StyledRemoveModal = styled(Modal)`
   .ant-modal-content {
     overflow: hidden;
     padding: 0;

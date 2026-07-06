@@ -1,13 +1,13 @@
 import { Form, Input, Select } from 'antd'
 import { useEffect } from 'react'
-import { CurrentStatusText, StatusModal } from '../ResourceModalStyles'
+import { CurrentStatusText, StyledStatusModal } from '../ModalStyles'
 
-export interface ResourceStatusFormValues<StatusValue extends string> {
+export interface StatusFormValues<StatusValue extends string> {
   note?: string
   status: StatusValue
 }
 
-interface ResourceStatusModalProps<StatusValue extends string> {
+interface StatusModalProps<StatusValue extends string> {
   confirmLoading?: boolean
   currentStatus?: StatusValue
   currentStatusPrefix: string
@@ -18,10 +18,10 @@ interface ResourceStatusModalProps<StatusValue extends string> {
   statusOptions: StatusValue[]
   title: string
   onCancel: () => void
-  onSubmit: (values: ResourceStatusFormValues<StatusValue>) => void
+  onSubmit: (values: StatusFormValues<StatusValue>) => void
 }
 
-export function ResourceStatusModal<StatusValue extends string>({
+export function StatusModal<StatusValue extends string>({
   confirmLoading,
   currentStatus,
   currentStatusPrefix,
@@ -33,15 +33,15 @@ export function ResourceStatusModal<StatusValue extends string>({
   title,
   onCancel,
   onSubmit,
-}: ResourceStatusModalProps<StatusValue>) {
-  const [form] = Form.useForm<ResourceStatusFormValues<StatusValue>>()
+}: StatusModalProps<StatusValue>) {
+  const [form] = Form.useForm<StatusFormValues<StatusValue>>()
 
   useEffect(() => {
     if (open) {
       form.setFieldsValue({
         status: currentStatus,
         note: '',
-      } as ResourceStatusFormValues<StatusValue>)
+      } as StatusFormValues<StatusValue>)
     }
   }, [currentStatus, form, open])
 
@@ -53,7 +53,7 @@ export function ResourceStatusModal<StatusValue extends string>({
   }
 
   return (
-    <StatusModal
+    <StyledStatusModal
       centered
       destroyOnHidden
       open={open}
@@ -92,6 +92,6 @@ export function ResourceStatusModal<StatusValue extends string>({
       <CurrentStatusText>
         {currentStatusPrefix}: {currentStatus ? getStatusLabel(currentStatus) : '-'}
       </CurrentStatusText>
-    </StatusModal>
+    </StyledStatusModal>
   )
 }

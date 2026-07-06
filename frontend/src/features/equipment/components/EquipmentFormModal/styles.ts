@@ -2,4 +2,4 @@ export {
   FormGrid,
   FormModal,
   FullField,
-} from '../../../../shared/components/ResourceModalStyles'
+} from '../../../../shared/components/ModalStyles'

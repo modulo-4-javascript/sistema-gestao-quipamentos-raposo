@@ -1,19 +1,18 @@
 import { HeaderContainer, PageBreadcrumb } from './styles'
 
 interface HeaderProps {
-  breadcrumbItems?: string[]
   currentPage: string
 }
 
-export function Header({ breadcrumbItems, currentPage }: HeaderProps) {
-  const items = breadcrumbItems ?? [currentPage]
-
+export function Header({ currentPage }: HeaderProps) {
   return (
     <HeaderContainer>
       <PageBreadcrumb
-        items={items.map((item) => ({
-          title: item,
-        }))}
+        items={[
+          {
+            title: currentPage,
+          },
+        ]}
       />
     </HeaderContainer>
   )

@@ -2,14 +2,17 @@ import { Alert, App as AntDesignApp, Spin } from 'antd'
 import { useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { AppLayout } from '../../../../app/layout/AppLayout'
+import {
+  DetailSummaryCards,
+  type DetailSummaryCardItem,
+} from '../../../../shared/components/DetailSummaryCards'
+import { DetailTextCard } from '../../../../shared/components/DetailTextCard'
 import { getRequestErrorMessage } from '../../../../shared/http/getRequestErrorMessage'
-import { LocationDetailSummaryCards } from '../../components/LocationDetailSummaryCards'
 import { LocationDetailsHeader } from '../../components/LocationDetailsHeader'
 import { LocationEquipmentCard } from '../../components/LocationEquipmentCard'
 import { LocationFormModal } from '../../components/LocationFormModal'
 import type { LocationFormValues } from '../../components/LocationFormModal'
 import { LocationInfoCard } from '../../components/LocationInfoCard'
-import { LocationNotesCard } from '../../components/LocationNotesCard'
 import { LocationRemoveModal } from '../../components/LocationRemoveModal'
 import { LocationStatusModal } from '../../components/LocationStatusModal'
 import type { LocationStatusFormValues } from '../../components/LocationStatusModal'
@@ -25,7 +28,6 @@ import {
   locationStatusOptions,
   locationTypeOptions,
   type CreateLocationPayload,
-  type LocationDetailSummary,
   type LocationDetails,
 } from '../../types/location'
 import {
@@ -53,11 +55,12 @@ function buildLocationPayload(values: LocationFormValues): CreateLocationPayload
 
 function buildLocationDetailSummary(
   location: LocationDetails,
-): LocationDetailSummary[] {
+): DetailSummaryCardItem[] {
   return [
     {
       id: 'status',
       title: 'Situação',
+      tone: location.status === 'ACTIVE' ? 'success' : 'default',
       value: getLocationStatusLabel(location.status),
       description: location.status === 'ACTIVE' ? 'Local disponível' : 'Uso pausado',
     },
@@ -219,7 +222,10 @@ export function LocationDetailsPage() {
           onRemove={() => setLocationToRemove(location)}
         />
 
-        <LocationDetailSummaryCards summaries={summaries} />
+        <DetailSummaryCards
+          ariaLabel="Resumo da localização"
+          summaries={summaries}
+        />
 
         <ContentGrid>
           <MainColumn>
@@ -236,7 +242,11 @@ export function LocationDetailsPage() {
           </SideColumn>
         </ContentGrid>
 
-        <LocationNotesCard description={location.description} />
+        <DetailTextCard
+          emptyText="Nenhuma descrição cadastrada."
+          text={location.description}
+          title="Descrição"
+        />
 
         <LocationFormModal
           confirmLoading={isSavingForm}

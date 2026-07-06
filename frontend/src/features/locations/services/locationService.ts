@@ -2,11 +2,9 @@ import { axiosApi } from '../../../services/api'
 import type {
   CreateLocationPayload,
   GetLocationEquipmentParams,
-  GetLocationHistoryParams,
   GetLocationListParams,
   LocationDetails,
   LocationEquipment,
-  LocationHistoryItem,
   LocationSummaryResponse,
   PaginatedResult,
   UpdateLocationPayload,
@@ -81,24 +79,6 @@ export const locationService = {
   ): Promise<PaginatedResult<LocationEquipment>> {
     const response = await axiosApi.get<PaginatedResult<LocationEquipment>>(
       `/locations/${locationId}/equipment`,
-      {
-        params: {
-          page: 1,
-          pageSize: 10,
-          ...params,
-        },
-      },
-    )
-
-    return response.data
-  },
-
-  async getLocationHistory(
-    locationId: string,
-    params: GetLocationHistoryParams = {},
-  ): Promise<PaginatedResult<LocationHistoryItem>> {
-    const response = await axiosApi.get<PaginatedResult<LocationHistoryItem>>(
-      `/locations/${locationId}/equipment-history`,
       {
         params: {
           page: 1,

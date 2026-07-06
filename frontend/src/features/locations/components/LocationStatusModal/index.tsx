@@ -1,12 +1,12 @@
-import { ResourceStatusModal } from '../../../../shared/components/ResourceStatusModal'
-import type { ResourceStatusFormValues } from '../../../../shared/components/ResourceStatusModal'
+import { StatusModal } from '../../../../shared/components/StatusModal'
+import type { StatusFormValues } from '../../../../shared/components/StatusModal'
 import {
   getLocationStatusLabel,
   type LocationDetails,
   type LocationStatus,
 } from '../../types/location'
 
-export type LocationStatusFormValues = ResourceStatusFormValues<LocationStatus>
+export type LocationStatusFormValues = StatusFormValues<LocationStatus>
 
 interface LocationStatusModalProps {
   location?: LocationDetails
@@ -26,7 +26,7 @@ export function LocationStatusModal({
   onSubmit,
 }: LocationStatusModalProps) {
   return (
-    <ResourceStatusModal
+    <StatusModal
       confirmLoading={confirmLoading}
       currentStatus={location?.status}
       currentStatusPrefix="Situação atual"

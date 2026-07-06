@@ -1,4 +1,4 @@
-import type { Equipment, EquipmentHistoryItem, EquipmentStatus } from '../../equipment/types/equipment'
+import type { Equipment, EquipmentStatus } from '../../equipment/types/equipment'
 
 export type LocationStatus = 'ACTIVE' | 'INACTIVE'
 
@@ -53,13 +53,6 @@ export interface LocationDetails extends Location {
   }
 }
 
-export interface LocationDetailSummary {
-  id: string
-  title: string
-  value: string
-  description?: string
-}
-
 export interface GetLocationListParams {
   search?: string
   status?: LocationStatus
@@ -70,11 +63,6 @@ export interface GetLocationListParams {
 
 export interface GetLocationEquipmentParams {
   status?: EquipmentStatus
-  page?: number
-  pageSize?: number
-}
-
-export interface GetLocationHistoryParams {
   page?: number
   pageSize?: number
 }
@@ -98,8 +86,6 @@ export interface UpdateLocationStatusPayload {
 }
 
 export type LocationEquipment = Equipment
-
-export type LocationHistoryItem = EquipmentHistoryItem
 
 export const locationStatusOptions: LocationStatus[] = ['ACTIVE', 'INACTIVE']
 

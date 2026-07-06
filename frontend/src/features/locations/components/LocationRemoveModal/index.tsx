@@ -1,4 +1,4 @@
-import { ResourceRemoveModal } from '../../../../shared/components/ResourceRemoveModal'
+import { RemoveModal } from '../../../../shared/components/RemoveModal'
 import type { LocationDetails } from '../../types/location'
 
 interface LocationRemoveModalProps {
@@ -19,7 +19,7 @@ export function LocationRemoveModal({
   const locationLabel = location ? `${location.code} - ${location.name}` : 'este local'
 
   return (
-    <ResourceRemoveModal
+    <RemoveModal
       confirmLoading={confirmLoading}
       hint="Locais com equipamentos vinculados não podem ser excluídos."
       message={`Deseja excluir "${locationLabel}"?`}

@@ -1,8 +1,8 @@
+import type { DetailSummaryCardItem } from '../../../shared/components/DetailSummaryCards'
 import {
   formatEquipmentDate,
   getEquipmentStatusLabel,
   type EquipmentDetail,
-  type EquipmentDetailSummary,
 } from '../types/equipment'
 
 // AULA 06:
@@ -70,7 +70,9 @@ export const equipmentDetailsMock: EquipmentDetail[] = [
   },
 ]
 
-export function getEquipmentDetailSummary(equipment: EquipmentDetail): EquipmentDetailSummary[] {
+export function getEquipmentDetailSummary(
+  equipment: EquipmentDetail,
+): DetailSummaryCardItem[] {
   return [
     {
       id: 'status',
@@ -99,7 +101,7 @@ export function getEquipmentDetailSummary(equipment: EquipmentDetail): Equipment
   ]
 }
 
-export const equipmentDetailSummaryMock: EquipmentDetailSummary[] = equipmentDetailsMock[0]
+export const equipmentDetailSummaryMock: DetailSummaryCardItem[] = equipmentDetailsMock[0]
   ? getEquipmentDetailSummary(equipmentDetailsMock[0])
   : []
 

@@ -2,17 +2,20 @@ import { Alert, App as AntDesignApp, Spin } from 'antd'
 import { useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { AppLayout } from '../../../../app/layout/AppLayout'
-import { DetailSummaryCards } from '../../components/DetailSummaryCards'
+import {
+  DetailSummaryCards,
+  type DetailSummaryCardItem,
+} from '../../../../shared/components/DetailSummaryCards'
+import { DetailTextCard } from '../../../../shared/components/DetailTextCard'
+import { getRequestErrorMessage } from '../../../../shared/http/getRequestErrorMessage'
 import { DetailsHeader } from '../../components/DetailsHeader'
 import { EquipmentFormModal } from '../../components/EquipmentFormModal'
 import type { EquipmentFormValues } from '../../components/EquipmentFormModal'
 import { EquipmentHistoryCard } from '../../components/EquipmentHistoryCard'
 import { EquipmentInfoCard } from '../../components/EquipmentInfoCard'
-import { EquipmentNotesCard } from '../../components/EquipmentNotesCard'
 import { EquipmentRemoveModal } from '../../components/EquipmentRemoveModal'
 import { EquipmentStatusModal } from '../../components/EquipmentStatusModal'
 import type { EquipmentStatusFormValues } from '../../components/EquipmentStatusModal'
-import { getRequestErrorMessage } from '../../../../shared/http/getRequestErrorMessage'
 import { useDeleteEquipment } from '../../hooks/useDeleteEquipment'
 import { useEquipmentDetails } from '../../hooks/useEquipmentDetails'
 import { useEquipmentLocationOptions } from '../../hooks/useEquipmentLocationOptions'
@@ -25,7 +28,6 @@ import {
   typeOptions,
   type CreateEquipmentPayload,
   type EquipmentDetail,
-  type EquipmentDetailSummary,
   type EquipmentLocationOption,
 } from '../../types/equipment'
 
@@ -52,7 +54,7 @@ function buildEquipmentPayload(values: EquipmentFormValues): CreateEquipmentPayl
 }
 
 // A API devolve os dados completos; esta função escolhe o que vira card de resumo.
-function buildDetailSummary(equipment: EquipmentDetail): EquipmentDetailSummary[] {
+function buildDetailSummary(equipment: EquipmentDetail): DetailSummaryCardItem[] {
   return [
     {
       id: 'status',
@@ -260,13 +262,20 @@ export function EquipmentDetailsPage() {
         />
 
         {/* Cards calculados a partir do equipamento carregado pela API. */}
-        <DetailSummaryCards summaries={summaries} />
+        <DetailSummaryCards
+          ariaLabel="Resumo do equipamento"
+          summaries={summaries}
+        />
 
         {/* Conteúdo principal: informações gerais, observações e histórico recente. */}
         <ContentGrid>
           <MainColumn>
             <EquipmentInfoCard equipment={equipment} />
-            <EquipmentNotesCard notes={equipment.notes} />
+            <DetailTextCard
+              emptyText="Nenhuma observação cadastrada."
+              text={equipment.notes}
+              title="Observações"
+            />
           </MainColumn>
 
           <SideColumn>

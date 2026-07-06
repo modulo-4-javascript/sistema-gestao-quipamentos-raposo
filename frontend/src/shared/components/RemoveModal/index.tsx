@@ -1,6 +1,6 @@
-import { Hint, Message, RemoveModal } from '../ResourceModalStyles'
+import { Hint, Message, StyledRemoveModal } from '../ModalStyles'
 
-interface ResourceRemoveModalProps {
+interface RemoveModalProps {
   confirmLoading?: boolean
   hint: string
   message: string
@@ -10,7 +10,7 @@ interface ResourceRemoveModalProps {
   onConfirm: () => void
 }
 
-export function ResourceRemoveModal({
+export function RemoveModal({
   confirmLoading,
   hint,
   message,
@@ -18,9 +18,9 @@ export function ResourceRemoveModal({
   title,
   onCancel,
   onConfirm,
-}: ResourceRemoveModalProps) {
+}: RemoveModalProps) {
   return (
-    <RemoveModal
+    <StyledRemoveModal
       centered
       open={open}
       title={title}
@@ -38,6 +38,6 @@ export function ResourceRemoveModal({
     >
       <Message>{message}</Message>
       <Hint>{hint}</Hint>
-    </RemoveModal>
+    </StyledRemoveModal>
   )
 }

@@ -1,12 +1,12 @@
-import { ResourceStatusModal } from '../../../../shared/components/ResourceStatusModal'
-import type { ResourceStatusFormValues } from '../../../../shared/components/ResourceStatusModal'
+import { StatusModal } from '../../../../shared/components/StatusModal'
+import type { StatusFormValues } from '../../../../shared/components/StatusModal'
 import {
   getEquipmentStatusLabel,
   type Equipment,
   type EquipmentStatus,
 } from '../../types/equipment'
 
-export type EquipmentStatusFormValues = ResourceStatusFormValues<EquipmentStatus>
+export type EquipmentStatusFormValues = StatusFormValues<EquipmentStatus>
 
 interface EquipmentStatusModalProps {
   equipment?: Equipment
@@ -26,7 +26,7 @@ export function EquipmentStatusModal({
   onSubmit,
 }: EquipmentStatusModalProps) {
   return (
-    <ResourceStatusModal
+    <StatusModal
       confirmLoading={confirmLoading}
       currentStatus={equipment?.status}
       currentStatusPrefix="Status atual"

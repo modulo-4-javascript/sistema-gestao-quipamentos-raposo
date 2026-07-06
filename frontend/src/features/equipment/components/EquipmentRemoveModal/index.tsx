@@ -1,4 +1,4 @@
-import { ResourceRemoveModal } from '../../../../shared/components/ResourceRemoveModal'
+import { RemoveModal } from '../../../../shared/components/RemoveModal'
 import type { Equipment } from '../../types/equipment'
 
 interface EquipmentRemoveModalProps {
@@ -16,10 +16,12 @@ export function EquipmentRemoveModal({
   onCancel,
   onConfirm,
 }: EquipmentRemoveModalProps) {
-  const equipmentLabel = equipment ? `${equipment.name} ${equipment.model}` : 'este equipamento'
+  const equipmentLabel = equipment
+    ? [equipment.name, equipment.model].filter(Boolean).join(' ')
+    : 'este equipamento'
 
   return (
-    <ResourceRemoveModal
+    <RemoveModal
       confirmLoading={confirmLoading}
       hint="Essa ação não poderá ser desfeita."
       message={`Deseja excluir "${equipmentLabel}"?`}

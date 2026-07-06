@@ -62,13 +62,6 @@ export interface EquipmentDetail extends Equipment {
   recentHistory: EquipmentHistoryItem[]
 }
 
-export interface EquipmentDetailSummary {
-  id: string
-  title: string
-  value: string
-  description: string
-}
-
 export interface EquipmentLocationOption {
   id: string
   label: string
